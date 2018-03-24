@@ -20,15 +20,16 @@
  * SOFTWARE.
  */
 
-package bill.catbox
+package bill.catbox.home
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import bill.catbox.R
 
-class MainActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_home)
     }
 }
