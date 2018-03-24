@@ -25,6 +25,7 @@ package bill.catbox.home
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import bill.catbox.R
+import bill.catbox.infra.toast
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.activity_home.*
 
@@ -50,6 +51,13 @@ class HomeActivity : AppCompatActivity(), HomeView {
         super.onPause()
     }
 
+    override fun onCatFound(attempts: Int) {
+        toast(resources.getQuantityString(R.plurals.cat_found, attempts, attempts))
+    }
+
+    override fun onEmptyBox(attempts: Int) {
+        toast(getString(R.string.empty_box, attempts))
+    }
 
     private fun setupButtons() {
         this.box1.setOnClickListener { boxChosenEvent.onNext(0) }
