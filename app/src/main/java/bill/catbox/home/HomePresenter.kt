@@ -22,41 +22,29 @@
 
 package bill.catbox.home
 
-import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import bill.catbox.R
-import io.reactivex.subjects.BehaviorSubject
-import kotlinx.android.synthetic.main.activity_home.*
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
+import io.reactivex.internal.disposables.EmptyDisposable
+import timber.log.Timber
 
-class HomeActivity : AppCompatActivity(), HomeView {
+class HomePresenter(private val view: HomeView) {
 
-    private val presenter = HomePresenter(this)
+    private var disposable: Disposable = EmptyDisposable.INSTANCE
 
-    override val boxChosenEvent = BehaviorSubject.create<Int>()!!
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
-        setupButtons()
+    fun attach() {
+        Timber.d("Presenter::attach")
+        disposable = view.boxChosenEvent
+                .subscribe {
+                    Timber.d("Box #$it chosen")
+                }
     }
 
-    override fun onResume() {
-        super.onResume()
-        presenter.attach()
+    fun detach() {
+        Timber.d("Presenter::detach")
+        disposable.dispose()
     }
+}
 
-    override fun onPause() {
-        presenter.detach()
-        super.onPause()
-    }
-
-
-    private fun setupButtons() {
-        this.box1.setOnClickListener { boxChosenEvent.onNext(0) }
-        this.box2.setOnClickListener { boxChosenEvent.onNext(1) }
-        this.box3.setOnClickListener { boxChosenEvent.onNext(2) }
-        this.box4.setOnClickListener { boxChosenEvent.onNext(3) }
-        this.box5.setOnClickListener { boxChosenEvent.onNext(4) }
-    }
-
+interface HomeView {
+    val boxChosenEvent: Observable<Int>
 }
