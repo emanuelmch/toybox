@@ -5,4 +5,11 @@
     <string name="box_3">Box 3</string>
     <string name="box_4">Box 4</string>
     <string name="box_5">Box 5</string>
+
+    <plurals name="cat_found">
+        <item quantity="one">Cat found on your first attempt!</item>
+        <item quantity="other">Cat found after %d attempts!</item>
+    </plurals>
+    <string name="empty_box">Empty box on your attempt number %d</string>
+    
 </resources>
