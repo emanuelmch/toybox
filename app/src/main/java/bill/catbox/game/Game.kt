@@ -1,12 +1,55 @@
 package bill.catbox.game
 
+import timber.log.Timber
+
 class GameEngine {
 
-    fun newGame() = GameState()
+    fun newGame() = GameState(setOf(GameNode(0),
+            GameNode(1),
+            GameNode(2),
+            GameNode(3),
+            GameNode(4)))
 
-    fun play(state: GameState, box: Int) =
-            state.copy(moveCount = state.moveCount + 1, isCatFound = box == 0)
+    fun play(state: GameState, boxChecked: Int): GameState {
+        Timber.d("Player checked box $boxChecked:")
+        val catFoundNodes = mutableSetOf<GameNode>()
+        val emptyBoxNodes = mutableSetOf<GameNode>()
+
+        for (node in state.gameNodes) {
+            val location = node.locationHistory.last()
+            val moves = node.moves.plus(boxChecked)
+
+            if (location == boxChecked) {
+                catFoundNodes.add(node.copy(moves = moves))
+            } else {
+                if (location > 0) emptyBoxNodes.add(GameNode(node.locationHistory.plus(location - 1), moves))
+                if (location < 4) emptyBoxNodes.add(GameNode(node.locationHistory.plus(location + 1), moves))
+            }
+        }
+
+        Timber.d("${emptyBoxNodes.size} new empty box nodes:")
+        emptyBoxNodes.forEach { Timber.d("$it") }
+
+        Timber.d("${catFoundNodes.size} new cat found nodes:")
+        catFoundNodes.forEach { Timber.d("$it") }
+
+        return if (emptyBoxNodes.isNotEmpty()) {
+            GameState(emptyBoxNodes)
+        } else {
+            GameState(catFoundNodes)
+        }
+    }
 }
 
-data class GameState(val moveCount: Int = 0,
-                     val isCatFound: Boolean = false)
+data class GameState(val gameNodes: Collection<GameNode> = emptySet()) {
+    val isCatFound = gameNodes.any { it.isCatFound }
+    val moveCount = gameNodes.firstOrNull()?.moves?.size ?: 0
+}
+
+data class GameNode(val locationHistory: List<Int>,
+                    val moves: List<Int> = listOf()) {
+
+    constructor(initialLocation: Int) : this(listOf(initialLocation))
+
+    val isCatFound = moves.isNotEmpty() && moves.last() == locationHistory.get(moves.lastIndex)
+}
