@@ -24,6 +24,7 @@ package bill.catbox.home
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
 import bill.catbox.R
 import bill.catbox.infra.toOrdinal
 import bill.catbox.infra.toast
@@ -42,6 +43,11 @@ class HomeActivity : AppCompatActivity(), HomeView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_activity)
         setupButtons()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+        return true
     }
 
     override fun onResume() {
