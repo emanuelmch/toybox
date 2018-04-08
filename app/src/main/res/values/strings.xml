@@ -11,4 +11,6 @@
         <item quantity="other">Cat found after %d attempts!</item>
     </plurals>
     <string name="empty_box">Empty box on your %s attempt</string>
+
+    <string name="settings">Settings</string>
 </resources>
