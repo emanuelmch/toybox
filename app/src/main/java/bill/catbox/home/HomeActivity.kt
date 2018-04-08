@@ -25,18 +25,18 @@ package bill.catbox.home
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
+import android.view.MenuItem
 import bill.catbox.R
 import bill.catbox.infra.toOrdinal
 import bill.catbox.infra.toast
-import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.home_activity.*
 
 class HomeActivity : AppCompatActivity(), HomeView {
 
-    private val presenter by lazy { HomePresenter(this) }
+    private val presenter by lazy { HomePresenter(this, this) }
 
+    override val menuSelectedEvent = PublishSubject.create<Int>()
     override val boxChosenEvent = PublishSubject.create<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +58,11 @@ class HomeActivity : AppCompatActivity(), HomeView {
     override fun onPause() {
         presenter.detach()
         super.onPause()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        menuSelectedEvent.onNext(item.itemId)
+        return true
     }
 
     override fun onCatFound(attempts: Int) {
