@@ -21,10 +21,12 @@
   ~ SOFTWARE.
   -->
 
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content"
-    android:name="bill.catbox.settings.SettingsFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="bill.catbox.settings.SettingsActivity" />
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- TODO Make a custom NumberPreference -->
+    <bill.catbox.infra.EditIntPreference
+        android:defaultValue="5"
+        android:inputType="number"
+        android:key="pref_boxCount"
+        android:summary="lalala"
+        android:title="@string/box_count" />
+</PreferenceScreen>

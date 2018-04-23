@@ -20,21 +20,21 @@
  * SOFTWARE.
  */
 
-package bill.catbox
+package bill.catbox.infra
 
-import android.app.Application
-import android.preference.PreferenceManager
-import timber.log.Timber
+import android.content.Context
+import android.preference.EditTextPreference
+import android.util.AttributeSet
 
-class CatBoxApplication() : Application() {
+//FIXME: Should have a better UI
+class EditIntPreference : EditTextPreference {
 
-    override fun onCreate() {
-        super.onCreate()
+    @JvmOverloads constructor(context: Context?,
+                              attrs: AttributeSet? = null,
+                              defStyleAttr: Int = android.R.attr.editTextPreferenceStyle
+    ) : super(context, attrs, defStyleAttr)
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
+    override fun getPersistedString(defaultReturnValue: String?) = getPersistedInt(-1).toString()
 
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
-    }
+    override fun persistString(value: String) = persistInt(value.toInt())
 }

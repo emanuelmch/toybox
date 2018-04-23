@@ -25,10 +25,11 @@ package bill.catbox.settings
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.preference.PreferenceFragment
 import android.support.v7.app.AppCompatActivity
 import bill.catbox.R
 
-class SettingsActivity: AppCompatActivity() {
+class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,5 +41,13 @@ class SettingsActivity: AppCompatActivity() {
             val intent = Intent(context, SettingsActivity::class.java)
             context.startActivity(intent)
         }
+    }
+}
+
+class SettingsFragment : PreferenceFragment() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        addPreferencesFromResource(R.xml.preferences)
     }
 }
