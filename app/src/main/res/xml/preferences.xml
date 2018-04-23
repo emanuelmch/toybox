@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- TODO Make a custom NumberPreference -->
+    <bill.catbox.infra.EditIntPreference
+        android:defaultValue="5"
+        android:inputType="number"
+        android:key="pref_boxCount"
+        android:summary="lalala"
+        android:title="@string/box_count" />
+</PreferenceScreen>
