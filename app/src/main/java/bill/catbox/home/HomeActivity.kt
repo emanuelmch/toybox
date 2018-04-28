@@ -6,17 +6,19 @@ import bill.catbox.R
 import bill.catbox.infra.toOrdinal
 import bill.catbox.infra.toast
 import io.reactivex.subjects.BehaviorSubject
-import kotlinx.android.synthetic.main.activity_home.*
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
+import kotlinx.android.synthetic.main.home_activity.*
 
 class HomeActivity : AppCompatActivity(), HomeView {
 
-    private val presenter = HomePresenter(this)
+    private val presenter by lazy { HomePresenter(this) }
 
-    override val boxChosenEvent = BehaviorSubject.create<Int>()!!
+    override val boxChosenEvent = PublishSubject.create<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
+        setContentView(R.layout.home_activity)
         setupButtons()
     }
 
