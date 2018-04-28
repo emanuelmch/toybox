@@ -5,6 +5,7 @@ import bill.catbox.game.GameEngine
 import bill.catbox.game.GameState
 import bill.catbox.infra.plusAssign
 import bill.catbox.navigation.Navigator
+import bill.catbox.settings.SettingsRepository
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
@@ -13,6 +14,7 @@ class HomePresenter(private val view: HomeView, context: Context) {
 
     private val game = GameEngine()
     private val navigator = Navigator(context)
+    private val settings = SettingsRepository(context)
 
     private val disposables = CompositeDisposable()
 
@@ -21,7 +23,12 @@ class HomePresenter(private val view: HomeView, context: Context) {
 
     fun attach() {
         Timber.d("Presenter::attach")
-        gameState = game.newGame()
+        disposables += settings.watchBoxCount()
+                .subscribe {
+                    gameState = game.newGame(it)
+                    view.startGame(it)
+                }
+
         disposables += view.boxChosenEvent
                 .subscribe {
                     Timber.d("Box #$it chosen")
@@ -49,4 +56,5 @@ interface HomeView {
 
     fun onCatFound(attempts: Int)
     fun onEmptyBox(attempts: Int)
+    fun startGame(boxCount: Int)
 }

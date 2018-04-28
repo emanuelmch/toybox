@@ -1,6 +1,9 @@
 package bill.catbox.infra
 
 import android.content.Context
+import android.support.annotation.LayoutRes
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.Toast
 
 // TODO: KTX 0.3 will include a similar function, so replace it when it's released
@@ -24,3 +27,6 @@ fun Int.toOrdinal(): String {
 
     return this.toString() + suffix
 }
+
+fun ViewGroup.inflateChild(@LayoutRes resource: Int) =
+        LayoutInflater.from(context).inflate(resource, this, false)
