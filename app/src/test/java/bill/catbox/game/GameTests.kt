@@ -8,7 +8,7 @@ class GameEngineTests {
 
     @Test
     fun testCatWasFound() {
-        val previousState = GameState(gameNodes = setOf(GameNode(3)))
+        val previousState = GameState(boxCount = 5, gameNodes = setOf(GameNode(3)))
 
         val newState = GameEngine().play(previousState, 3)
 
@@ -17,7 +17,7 @@ class GameEngineTests {
 
     @Test
     fun testCatWasInFirstBox() {
-        val previousState = GameState(gameNodes = setOf(GameNode(0)))
+        val previousState = GameState(boxCount = 5, gameNodes = setOf(GameNode(0)))
 
         val newState = GameEngine().play(previousState, 3)
 
@@ -28,7 +28,7 @@ class GameEngineTests {
 
     @Test
     fun testCatWasInLastBox() {
-        val previousState = GameState(gameNodes = setOf(GameNode(4)))
+        val previousState = GameState(boxCount = 5, gameNodes = setOf(GameNode(4)))
 
         val newState = GameEngine().play(previousState, 3)
 
@@ -39,7 +39,7 @@ class GameEngineTests {
 
     @Test
     fun testCatWasInTheMiddle() {
-        val previousState = GameState(gameNodes = setOf(GameNode(3)))
+        val previousState = GameState(boxCount = 5, gameNodes = setOf(GameNode(3)))
 
         val newState = GameEngine().play(previousState, 2)
 
