@@ -26,8 +26,7 @@ import timber.log.Timber
 
 class GameEngine {
 
-    // TODO: Remove boxCount's default value
-    fun newGame(boxCount: Int = 5) = GameState(boxCount)
+    fun newGame(boxCount: Int) = GameState(boxCount)
 
     fun play(state: GameState, boxChecked: Int): GameState {
         Timber.d("Player checked box $boxChecked:")
