@@ -26,11 +26,8 @@ import timber.log.Timber
 
 class GameEngine {
 
-    fun newGame() = GameState(setOf(GameNode(0),
-            GameNode(1),
-            GameNode(2),
-            GameNode(3),
-            GameNode(4)))
+    // TODO: Remove boxCount's default value
+    fun newGame(boxCount: Int = 5) = GameState(boxCount)
 
     fun play(state: GameState, boxChecked: Int): GameState {
         Timber.d("Player checked box $boxChecked:")
@@ -44,8 +41,13 @@ class GameEngine {
             if (location == boxChecked) {
                 catFoundNodes.add(node.copy(moves = moves))
             } else {
-                if (location > 0) emptyBoxNodes.add(GameNode(node.locationHistory.plus(location - 1), moves))
-                if (location < 4) emptyBoxNodes.add(GameNode(node.locationHistory.plus(location + 1), moves))
+                val lastBox = state.boxCount - 1
+                if (location > 0) {
+                    emptyBoxNodes.add(GameNode(node.locationHistory.plus(location - 1), moves))
+                }
+                if (location < lastBox) {
+                    emptyBoxNodes.add(GameNode(node.locationHistory.plus(location + 1), moves))
+                }
             }
         }
 
@@ -56,14 +58,15 @@ class GameEngine {
         catFoundNodes.forEach { Timber.d("$it") }
 
         return if (emptyBoxNodes.isNotEmpty()) {
-            GameState(emptyBoxNodes)
+            state.copy(gameNodes = emptyBoxNodes)
         } else {
-            GameState(catFoundNodes)
+            state.copy(gameNodes = catFoundNodes)
         }
     }
 }
 
-data class GameState(val gameNodes: Collection<GameNode> = emptySet()) {
+data class GameState(val boxCount: Int,
+                     val gameNodes: Collection<GameNode> = (0 until boxCount).map { GameNode(it) }) {
     val isCatFound = gameNodes.any { it.isCatFound }
     val moveCount = gameNodes.firstOrNull()?.moves?.size ?: 0
 }
