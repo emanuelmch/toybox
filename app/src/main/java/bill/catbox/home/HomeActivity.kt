@@ -107,8 +107,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
         private val boxButton: Button = itemView.buttonBox
 
         fun bind(position: Int) {
-            // TODO: Make this a String resource
-            boxButton.text = "Button ${position + 1}"
+            boxButton.text = getString(R.string.box_number, position + 1)
             boxButton.setOnClickListener { boxChosenEvent.onNext(position) }
         }
     }
