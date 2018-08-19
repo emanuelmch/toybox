@@ -25,6 +25,7 @@ package bill.catbox.infra
 import android.content.Context
 import android.support.annotation.LayoutRes
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 
@@ -50,5 +51,5 @@ fun Int.toOrdinal(): String {
     return this.toString() + suffix
 }
 
-fun ViewGroup.inflateChild(@LayoutRes resource: Int) =
+fun ViewGroup.inflateChild(@LayoutRes resource: Int): View =
         LayoutInflater.from(context).inflate(resource, this, false)

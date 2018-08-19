@@ -75,5 +75,5 @@ data class GameNode(val locationHistory: List<Int>,
 
     constructor(initialLocation: Int) : this(listOf(initialLocation))
 
-    val isCatFound = moves.isNotEmpty() && moves.last() == locationHistory.get(moves.lastIndex)
+    val isCatFound = moves.isNotEmpty() && moves.last() == locationHistory[moves.lastIndex]
 }

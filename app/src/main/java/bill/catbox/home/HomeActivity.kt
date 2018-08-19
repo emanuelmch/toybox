@@ -96,7 +96,7 @@ class HomeActivity : AppCompatActivity(), HomeView {
         override fun getItemCount() = boxCount
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-                parent.inflateChild(R.layout.home_item).let { BoxViewHolder(it) }
+                BoxViewHolder(parent.inflateChild(R.layout.home_item))
 
         override fun onBindViewHolder(holder: BoxViewHolder, position: Int) {
             holder.bind(position)

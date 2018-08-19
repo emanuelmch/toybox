@@ -26,7 +26,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
 
 private const val boxCountPreference = "pref_boxCount"
 

@@ -32,7 +32,7 @@ fun <T> Observable<T>.testSubscribe(): TestObserver<T> {
     val observer = TestObserver<T>()
 
     return this
-            .doOnSubscribe {
+            .doOnSubscribe { _ ->
                 RxJavaPlugins.reset()
                 RxJavaPlugins.setErrorHandler { list.add(it) }
             }

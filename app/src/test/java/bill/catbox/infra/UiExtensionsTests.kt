@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+@file:Suppress("ClassName")
 
 package bill.catbox.infra
 
@@ -31,7 +32,7 @@ import org.junit.runners.Parameterized
 
 //TODO: Replace all of this with JUnit5 parameterized tests
 @RunWith(Parameterized::class)
-class `Ui Extensions - To Ordinal - Numbers ending in st`(val number: Int) {
+class `Ui Extensions - To Ordinal - Numbers ending in st`(private val number: Int) {
 
     companion object {
         @JvmStatic
@@ -47,7 +48,7 @@ class `Ui Extensions - To Ordinal - Numbers ending in st`(val number: Int) {
 }
 
 @RunWith(Parameterized::class)
-class `Ui Extensions - To Ordinal - Numbers ending in nd`(val number: Int) {
+class `Ui Extensions - To Ordinal - Numbers ending in nd`(private val number: Int) {
 
     companion object {
         @JvmStatic
@@ -63,7 +64,7 @@ class `Ui Extensions - To Ordinal - Numbers ending in nd`(val number: Int) {
 }
 
 @RunWith(Parameterized::class)
-class `Ui Extensions - To Ordinal - Numbers ending in rd`(val number: Int) {
+class `Ui Extensions - To Ordinal - Numbers ending in rd`(private val number: Int) {
 
     companion object {
         @JvmStatic
@@ -79,7 +80,7 @@ class `Ui Extensions - To Ordinal - Numbers ending in rd`(val number: Int) {
 }
 
 @RunWith(Parameterized::class)
-class `Ui Extensions - To Ordinal - Numbers ending in th`(val number: Int) {
+class `Ui Extensions - To Ordinal - Numbers ending in th`(private val number: Int) {
 
     companion object {
         @JvmStatic

@@ -27,12 +27,11 @@ import android.preference.EditTextPreference
 import android.util.AttributeSet
 
 //FIXME: Should have a better UI
-class EditIntPreference : EditTextPreference {
-
-    @JvmOverloads constructor(context: Context?,
-                              attrs: AttributeSet? = null,
-                              defStyleAttr: Int = android.R.attr.editTextPreferenceStyle
-    ) : super(context, attrs, defStyleAttr)
+class EditIntPreference @JvmOverloads constructor(
+        context: Context?,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = android.R.attr.editTextPreferenceStyle
+) : EditTextPreference(context, attrs, defStyleAttr) {
 
     override fun getPersistedString(defaultReturnValue: String?) = getPersistedInt(-1).toString()
 

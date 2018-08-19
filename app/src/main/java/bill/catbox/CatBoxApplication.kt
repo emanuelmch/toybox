@@ -29,7 +29,8 @@ import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 
-class CatBoxApplication() : Application() {
+@Suppress("unused")
+class CatBoxApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()

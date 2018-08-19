@@ -115,7 +115,8 @@ private open class MockSharedPreferences : SharedPreferences {
     override fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener?) {
         if (listener == null) return
 
-        if (listeners.remove(listener) == false) {
+        val wasRemoved = listeners.remove(listener)
+        if (wasRemoved.not()) {
             throw IllegalArgumentException("Trying to unregister non-registered Listener")
         }
     }
