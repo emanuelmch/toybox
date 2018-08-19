@@ -21,10 +21,13 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- Ignoring error caused by issue https://issuetracker.google.com/issues/111146562 -->
     <item
         android:id="@+id/actionSettings"
         android:icon="@drawable/ic_settings_white_24dp"
         android:title="@string/settings"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"
+        tools:ignore="AppCompatResource" />
 </menu>
