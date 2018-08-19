@@ -22,16 +22,14 @@
 
 package bill.catbox.infra
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.annotation.LayoutRes
+import com.google.android.material.snackbar.Snackbar
 
-// TODO: KTX 0.3 will include a similar function, so replace it when it's released
-fun Context.toast(text: String) {
-    Toast.makeText(this, text, Toast.LENGTH_SHORT)
+fun View.snackbar(text: String) {
+    Snackbar.make(this, text, Snackbar.LENGTH_SHORT)
             .apply { show() }
 }
 

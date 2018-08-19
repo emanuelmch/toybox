@@ -32,8 +32,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import bill.catbox.R
 import bill.catbox.infra.inflateChild
+import bill.catbox.infra.snackbar
 import bill.catbox.infra.toOrdinal
-import bill.catbox.infra.toast
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.home_activity.*
 import kotlinx.android.synthetic.main.home_item.view.*
@@ -78,11 +78,11 @@ class HomeActivity : AppCompatActivity(), HomeView {
     }
 
     override fun onCatFound(attempts: Int) {
-        toast(resources.getQuantityString(R.plurals.cat_found, attempts, attempts))
+        boxes.snackbar(resources.getQuantityString(R.plurals.cat_found, attempts, attempts))
     }
 
     override fun onEmptyBox(attempts: Int) {
-        toast(getString(R.string.empty_box, attempts.toOrdinal()))
+        boxes.snackbar(getString(R.string.empty_box, attempts.toOrdinal()))
     }
 
     private inner class BoxAdapter : RecyclerView.Adapter<BoxViewHolder>() {
