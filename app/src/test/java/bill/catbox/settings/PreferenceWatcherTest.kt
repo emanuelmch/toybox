@@ -23,7 +23,6 @@
 package bill.catbox.settings
 
 import android.content.SharedPreferences
-import bill.catbox.test.testSubscribe
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
@@ -56,7 +55,7 @@ class PreferenceWatcherTest {
     fun testWatchInt_DefaultValue() {
         val subscriber = PreferenceWatcher(sharedPrefs)
                 .watchInt("key", 1984)
-                .testSubscribe()
+                .test()
 
         subscriber.assertValuesOnly(1984)
         subscriber.dispose()
@@ -66,7 +65,7 @@ class PreferenceWatcherTest {
     @Test
     fun testWatchInt_ValueChanges() {
         sharedPrefs.setInt("key", 123)
-        val subscriber = PreferenceWatcher(sharedPrefs).watchInt("key").testSubscribe()
+        val subscriber = PreferenceWatcher(sharedPrefs).watchInt("key").test()
         sharedPrefs.setInt("key", 124)
 
         subscriber.assertValuesOnly(123, 124)
@@ -77,9 +76,9 @@ class PreferenceWatcherTest {
     @Test
     fun testWatchInt_MultipleSubscribers() {
         sharedPrefs.setInt("key", 123)
-        val subscriber1 = PreferenceWatcher(sharedPrefs).watchInt("key").testSubscribe()
+        val subscriber1 = PreferenceWatcher(sharedPrefs).watchInt("key").test()
         sharedPrefs.setInt("key", 124)
-        val subscriber2 = PreferenceWatcher(sharedPrefs).watchInt("key").testSubscribe()
+        val subscriber2 = PreferenceWatcher(sharedPrefs).watchInt("key").test()
         sharedPrefs.setInt("key", 125)
 
         subscriber1.assertValuesOnly(123, 124, 125)
