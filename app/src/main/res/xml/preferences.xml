@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
   ~
@@ -20,16 +21,12 @@
   ~ SOFTWARE.
   -->
 
-<resources>
-    <string name="app_name">The Cat In The Box</string>
-    <string name="box_number">Box %d</string>
-
-    <plurals name="cat_found">
-        <item quantity="one">Cat found on your first attempt!</item>
-        <item quantity="other">Cat found after %d attempts!</item>
-    </plurals>
-    <string name="empty_box">Empty box on your %s attempt</string>
-
-    <string name="settings">Settings</string>
-    <string name="box_count">Box Count</string>
-</resources>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- TODO Make a custom NumberPreference -->
+    <bill.catbox.infra.EditIntPreference
+        android:defaultValue="5"
+        android:inputType="number"
+        android:key="pref_boxCount"
+        android:summary="lalala"
+        android:title="@string/box_count" />
+</PreferenceScreen>

@@ -20,35 +20,34 @@
  * SOFTWARE.
  */
 
-package bill.catbox.infra
+package bill.catbox.home
 
-import android.content.Context
-import android.support.annotation.LayoutRes
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.widget.Toast
+import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.assertion.ViewAssertions.matches
+import android.support.test.espresso.matcher.ViewMatchers.*
+import android.support.test.filters.LargeTest
+import android.support.test.rule.ActivityTestRule
+import android.support.test.runner.AndroidJUnit4
+import bill.catbox.R
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
-// TODO: KTX 0.3 will include a similar function, so replace it when it's released
-fun Context.toast(text: String) {
-    Toast.makeText(this, text, Toast.LENGTH_SHORT)
-            .apply { show() }
-}
+@RunWith(AndroidJUnit4::class)
+@LargeTest
+class HomeNavigationTests {
 
-// TODO: Should we ask for Context and get text from resources?
-fun Int.toOrdinal(): String {
-    val suffix = if ((this % 100) in 4..19) {
-        "th"
-    } else {
-        when (this % 10) {
-            1 -> "st"
-            2 -> "nd"
-            3 -> "rd"
-            else -> "th"
-        }
+    @get:Rule
+    val homeActivity = ActivityTestRule(HomeActivity::class.java)
+
+    @Test
+    fun testNavigatingToSettings() {
+        onView(withId(R.id.actionSettings))
+                .perform(click())
+
+        //TODO: Try and find a more reliable way of checking we moved screen
+        onView(withText(R.string.settings))
+                .check(matches(isDisplayed()))
     }
-
-    return this.toString() + suffix
 }
-
-fun ViewGroup.inflateChild(@LayoutRes resource: Int) =
-        LayoutInflater.from(context).inflate(resource, this, false)

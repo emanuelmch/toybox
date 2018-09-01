@@ -23,32 +23,18 @@
 package bill.catbox.infra
 
 import android.content.Context
-import android.support.annotation.LayoutRes
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.widget.Toast
+import android.preference.EditTextPreference
+import android.util.AttributeSet
 
-// TODO: KTX 0.3 will include a similar function, so replace it when it's released
-fun Context.toast(text: String) {
-    Toast.makeText(this, text, Toast.LENGTH_SHORT)
-            .apply { show() }
+//FIXME: Should have a better UI
+class EditIntPreference : EditTextPreference {
+
+    @JvmOverloads constructor(context: Context?,
+                              attrs: AttributeSet? = null,
+                              defStyleAttr: Int = android.R.attr.editTextPreferenceStyle
+    ) : super(context, attrs, defStyleAttr)
+
+    override fun getPersistedString(defaultReturnValue: String?) = getPersistedInt(-1).toString()
+
+    override fun persistString(value: String) = persistInt(value.toInt())
 }
-
-// TODO: Should we ask for Context and get text from resources?
-fun Int.toOrdinal(): String {
-    val suffix = if ((this % 100) in 4..19) {
-        "th"
-    } else {
-        when (this % 10) {
-            1 -> "st"
-            2 -> "nd"
-            3 -> "rd"
-            else -> "th"
-        }
-    }
-
-    return this.toString() + suffix
-}
-
-fun ViewGroup.inflateChild(@LayoutRes resource: Int) =
-        LayoutInflater.from(context).inflate(resource, this, false)
