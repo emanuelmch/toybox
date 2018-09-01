@@ -27,9 +27,9 @@ import bill.catbox.game.GameNode
 import bill.catbox.game.GameState
 import bill.catbox.navigation.Navigator
 import bill.catbox.settings.SettingsRepository
-import bill.catbox.test.RxSchedulersRule
+import bill.catbox.test.ReactiveTestRule
 import bill.catbox.test.nonNull
-import io.reactivex.Observable
+import bill.reactive.Publishers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,7 +41,7 @@ import org.mockito.MockitoAnnotations
 class HomePresenterTests {
 
     @get:Rule
-    val rxSchedulersRule = RxSchedulersRule()
+    val reactivesRule = ReactiveTestRule()
 
     @Mock(answer = Answers.RETURNS_MOCKS)
     private lateinit var view: HomeView
@@ -74,7 +74,7 @@ class HomePresenterTests {
 
     @Test
     fun `should call view_onCatFound when cat is found`() {
-        `when`(view.boxChosenEvent).thenReturn(Observable.just(0))
+        `when`(view.boxChosenEvent).thenReturn(Publishers.elements(0))
 
         val catFoundGameNode = GameNode(listOf(0), listOf(0))
         val catFoundState = GameState(1, listOf(catFoundGameNode))

@@ -20,22 +20,22 @@
  * SOFTWARE.
  */
 
-package bill.catbox
+package bill.catbox.test
 
-import android.app.Application
-import android.preference.PreferenceManager
-import timber.log.Timber
+import bill.reactive.TestMode
+import org.junit.rules.TestRule
+import org.junit.runner.Description
+import org.junit.runners.model.Statement
 
-@Suppress("unused")
-class CatBoxApplication : Application() {
+class ReactiveTestRule : TestRule {
 
-    override fun onCreate() {
-        super.onCreate()
+    override fun apply(base: Statement, description: Description?) = object: Statement() {
+        override fun evaluate() {
+            TestMode.isEnabled = true
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+            base.evaluate()
+
+            TestMode.isEnabled = false
         }
-
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
     }
 }

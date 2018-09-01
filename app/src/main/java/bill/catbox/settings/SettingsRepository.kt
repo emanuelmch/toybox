@@ -25,7 +25,8 @@ package bill.catbox.settings
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import io.reactivex.Observable
+import bill.reactive.Publisher
+import bill.reactive.Publishers
 
 private const val boxCountPreference = "pref_boxCount"
 
@@ -40,17 +41,20 @@ class PreferenceWatcher(private val sharedPrefs: SharedPreferences) {
 
     constructor(context: Context) : this(PreferenceManager.getDefaultSharedPreferences(context))
 
-    fun watchInt(key: String, defaultValue: Int = 0): Observable<Int> =
-            Observable
-                    .create<Unit> { emitter ->
-                        val callback = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
-                            if (changedKey == key) emitter.onNext(Unit)
-                        }
-
-                        emitter.setCancellable { sharedPrefs.unregisterOnSharedPreferenceChangeListener(callback) }
-                        sharedPrefs.registerOnSharedPreferenceChangeListener(callback)
+    fun watchInt(key: String, defaultValue: Int = 0): Publisher<Int> {
+        lateinit var callback: SharedPreferences.OnSharedPreferenceChangeListener
+        return Publishers
+                .onSubscribe<Unit> { subscriber ->
+                    callback = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
+                        if (changedKey == key) subscriber.onNext(Unit)
                     }
-                    .startWith(Unit)
-                    .map { sharedPrefs.getInt(key, defaultValue) }
-                    .distinctUntilChanged()
+
+                    sharedPrefs.registerOnSharedPreferenceChangeListener(callback)
+
+                    subscriber.onNext(Unit)
+                }
+                .doOnFinish { sharedPrefs.unregisterOnSharedPreferenceChangeListener(callback) }
+                .map { sharedPrefs.getInt(key, defaultValue) }
+                .distinctUntilChanged()
+    }
 }

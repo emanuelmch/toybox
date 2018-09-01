@@ -34,7 +34,7 @@ import bill.catbox.R
 import bill.catbox.infra.inflateChild
 import bill.catbox.infra.snackbar
 import bill.catbox.infra.toOrdinal
-import io.reactivex.subjects.PublishSubject
+import bill.reactive.Processors
 import kotlinx.android.synthetic.main.home_activity.*
 import kotlinx.android.synthetic.main.home_item.view.*
 import timber.log.Timber
@@ -44,8 +44,8 @@ class HomeActivity : AppCompatActivity(), HomeView {
     private val presenter by lazy { HomePresenter(this, this) }
     private val boxAdapter by lazy { BoxAdapter().apply { boxes.adapter = this } }
 
-    override val menuSelectedEvent = PublishSubject.create<Int>()
-    override val boxChosenEvent = PublishSubject.create<Int>()
+    override val menuSelectedEvent = Processors.cold<Int>()
+    override val boxChosenEvent = Processors.cold<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

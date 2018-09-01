@@ -20,22 +20,19 @@
  * SOFTWARE.
  */
 
-package bill.catbox
+package bill.reactive
 
-import android.app.Application
-import android.preference.PreferenceManager
-import timber.log.Timber
+class SubscriptionBag {
 
-@Suppress("unused")
-class CatBoxApplication : Application() {
+    private val disposables = mutableListOf<Subscription>()
 
-    override fun onCreate() {
-        super.onCreate()
+    // TODO: Should make this mutation-safe
+    fun clear() {
+        disposables.forEach(Subscription::cancel)
+        disposables.clear()
+    }
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
-
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
+    operator fun plusAssign(subscription: Subscription) {
+        disposables += subscription
     }
 }

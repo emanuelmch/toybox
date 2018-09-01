@@ -20,22 +20,32 @@
  * SOFTWARE.
  */
 
-package bill.catbox
+package bill.reactive
 
-import android.app.Application
-import android.preference.PreferenceManager
-import timber.log.Timber
+interface Publisher<T> {
+    // Subscribing
+    fun subscribe(onNext: (T) -> Unit = {}): Subscription
+    fun subscribe(subscriber: Subscriber<T>): Subscription
+    fun test(): TestSubscriber<T>
 
-@Suppress("unused")
-class CatBoxApplication : Application() {
+    // Processors
+    fun distinctUntilChanged(): Publisher<T>
+    fun <V> map(function: (T) -> V): Publisher<V>
+    fun startWith(element: T): Publisher<T>
 
-    override fun onCreate() {
-        super.onCreate()
-
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
-
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
-    }
+    // Events
+    fun doOnNext(action: (T) -> Unit) : Publisher<T>
+    fun doOnFinish(action: () -> Unit): Publisher<T>
 }
+
+interface Subscriber<T> {
+    fun onNext(element : T)
+    fun onComplete()
+    fun onCancel()
+}
+
+interface Subscription {
+    fun cancel()
+}
+
+interface Processor<T, V>: Subscriber<T>, Publisher<V>

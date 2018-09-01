@@ -20,22 +20,28 @@
  * SOFTWARE.
  */
 
-package bill.catbox
+package bill.reactive
 
-import android.app.Application
-import android.preference.PreferenceManager
-import timber.log.Timber
+import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert
+import org.junit.Test
 
-@Suppress("unused")
-class CatBoxApplication : Application() {
+class PublishersTests {
 
-    override fun onCreate() {
-        super.onCreate()
+    @Test
+    fun `onSubscribe creates a Publisher you can subscribe to`() {
+        Publishers
+                .onSubscribe<Unit> { }
+                .subscribe()
+    }
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
+    @Test
+    fun `onSubscribe creates a Publisher that runs the setup function when you subscribe to it`() {
+        var hasBeenCalled = false
+        Publishers
+                .onSubscribe<Unit> { hasBeenCalled = true }
+                .subscribe()
 
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
+        MatcherAssert.assertThat(hasBeenCalled, CoreMatchers.`is`(true))
     }
 }

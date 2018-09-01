@@ -20,11 +20,46 @@
  * SOFTWARE.
  */
 
-package bill.catbox.infra
+package bill.reactive
 
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+class BaseSubscriber<T> internal constructor(private val onNextFunction: (T) -> Unit):Subscriber<T> {
 
-operator fun CompositeDisposable.plusAssign(disposable: Disposable) {
-    this.add(disposable)
+    override fun onNext(element: T) {
+        onNextFunction(element)
+    }
+
+    override fun onComplete() {
+    }
+
+    override fun onCancel() {
+    }
+}
+
+class TestSubscriber<T> internal constructor(publisher: Publisher<T>){
+
+    private val emittedValues = mutableListOf<T>()
+    private val subscription: Subscription
+
+    init {
+        subscription = publisher.subscribe { this.emittedValues += it }
+    }
+
+    fun assertValuesOnly(vararg elements: T): TestSubscriber<T> {
+        if (elements.toList() != emittedValues) {
+            // FIXME: Should have a better error message
+            throw AssertionError("Values are wrong, expected [$elements] but was [$emittedValues]")
+        }
+
+        return this
+    }
+
+    fun cancel(): TestSubscriber<T> {
+        subscription.cancel()
+        return this
+    }
+
+    // FIXME: Find out how to handle errors
+    fun assertNoErrors(): TestSubscriber<T> {
+        return this
+    }
 }
