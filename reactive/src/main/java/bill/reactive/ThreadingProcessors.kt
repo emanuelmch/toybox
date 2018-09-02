@@ -22,13 +22,45 @@
 
 package bill.reactive
 
+import android.os.Handler
+import android.os.Looper
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-internal class SignalOnThreadProcessor<T>(origin: Publisher<T>, threadWorker: ThreadWorker) : BaseProcessor<T>(origin)
+internal class SignalOnThreadProcessor<T>(origin: Publisher<T>, private val threadWorker: ThreadWorker) : BaseProcessor<T>(origin) {
+    override fun onNext(element: T) {
+        threadWorker.run {
+            super.onNext(element)
+        }
+    }
+}
 
-internal interface ThreadWorker
+internal interface ThreadWorker {
+    fun run(action: () -> Unit)
+}
 
-internal class BackgroundThreadWorker() : ThreadWorker
-internal class ForegroundThreadWorker() : ThreadWorker
+internal class BackgroundThreadWorker : ThreadWorker {
+    private val threadPool by lazy { Executors.newCachedThreadPool() }
+
+    override fun run(action: () -> Unit) {
+        if (TestMode.isEnabled) {
+            action()
+        } else {
+            threadPool.submit(action)
+        }
+    }
+}
+
+internal class ForegroundThreadWorker : ThreadWorker {
+    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+
+    override fun run(action: () -> Unit) {
+        if (TestMode.isEnabled) {
+            action()
+        } else {
+            mainHandler.post(action)
+        }
+    }
+}
 
 internal class DelayProcessor<T>(origin: Publisher<T>, delay: Long, unit: TimeUnit) : BaseProcessor<T>(origin)
