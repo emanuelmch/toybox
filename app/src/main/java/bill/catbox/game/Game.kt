@@ -26,9 +26,9 @@ import timber.log.Timber
 
 open class GameEngine {
 
-    fun newGame(boxCount: Int) = GameState(boxCount)
+    open fun newGame(boxCount: Int) = GameState(boxCount)
 
-    fun play(state: GameState, boxChecked: Int): GameState {
+    open fun play(state: GameState, boxChecked: Int): GameState {
         Timber.d("Player checked box $boxChecked:")
         val catFoundNodes = mutableSetOf<GameNode>()
         val emptyBoxNodes = mutableSetOf<GameNode>()

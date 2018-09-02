@@ -43,11 +43,12 @@ class HomePresenter(private val view: HomeView,
 
     private val disposables = CompositeDisposable()
 
-    // TODO: Remove this using the reduce Observable
-    private var gameState = GameState(0)
-
     fun attach() {
         Timber.d("Presenter::attach")
+
+        // TODO: Remove this variable using a reduce Observable
+        var gameState = GameState(0)
+
         disposables += settings.watchBoxCount()
                 .subscribe {
                     gameState = game.newGame(it)
