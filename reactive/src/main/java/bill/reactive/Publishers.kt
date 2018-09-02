@@ -22,6 +22,8 @@
 
 package bill.reactive
 
+import java.util.concurrent.TimeUnit
+
 object Publishers {
 
     fun <T> onSubscribe(setup: (Subscriber<T>) -> Unit): Publisher<T> = HotPublisher(setup)
@@ -41,6 +43,11 @@ internal abstract class BasePublisher<T> : Publisher<T> {
     override fun distinctUntilChanged() = DistinctUntilChangedProcessor(this)
     override fun <V> map(function: (T) -> V) = MapperProcessor(this, function)
     override fun startWith(element: T) = StartWithProcessor(this, element)
+
+    override fun delay(delay: Long, unit: TimeUnit) = this
+    override fun signalOnBackground() = this
+    override fun signalOnForeground() = this
+    override fun blockingLast() = BlockingLastSubscriber<T>().subscribeTo(this)
 
     override fun doOnNext(action: (T) -> Unit) = DoOnNextProcessor(this, action)
     override fun doOnFinish(action: () -> Unit) = DoOnFinishProcessor(this, action)

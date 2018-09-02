@@ -29,7 +29,9 @@ import bill.catbox.navigation.Navigator
 import bill.catbox.settings.SettingsRepository
 import bill.reactive.SubscriptionBag
 import bill.reactive.Publisher
+import bill.reactive.Publishers
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class HomePresenter(private val view: HomeView,
                     private val game: GameEngine,
@@ -55,10 +57,19 @@ class HomePresenter(private val view: HomeView,
                 }
 
         disposables += view.boxChosenEvent
+                .signalOnBackground()
                 .doOnNext {
                     Timber.d("Box #$it chosen")
                     gameState = game.play(gameState, it)
                 }
+                .map {
+                    if (gameState.isCatFound) {
+                        Publishers.elements(it).delay(2, TimeUnit.SECONDS).blockingLast()
+                    } else {
+                        it
+                    }
+                }
+                .signalOnForeground()
                 .subscribe {
                     if (gameState.isCatFound) {
                         view.onCatFound(gameState.moveCount)

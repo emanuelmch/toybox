@@ -22,6 +22,8 @@
 
 package bill.reactive
 
+import java.util.concurrent.TimeUnit
+
 interface Publisher<T> {
     // Subscribing
     fun subscribe(onNext: (T) -> Unit = {}): Subscription
@@ -32,6 +34,12 @@ interface Publisher<T> {
     fun distinctUntilChanged(): Publisher<T>
     fun <V> map(function: (T) -> V): Publisher<V>
     fun startWith(element: T): Publisher<T>
+
+    // Threading Processors
+    fun delay(delay: Long, unit: TimeUnit): Publisher<T>
+    fun signalOnBackground(): Publisher<T>
+    fun signalOnForeground(): Publisher<T>
+    fun blockingLast(): T
 
     // Events
     fun doOnNext(action: (T) -> Unit) : Publisher<T>

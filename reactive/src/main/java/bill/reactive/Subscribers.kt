@@ -22,6 +22,9 @@
 
 package bill.reactive
 
+import java.lang.IllegalStateException
+import java.util.concurrent.CountDownLatch
+
 class BaseSubscriber<T> internal constructor(private val onNextFunction: (T) -> Unit):Subscriber<T> {
 
     override fun onNext(element: T) {
@@ -32,6 +35,34 @@ class BaseSubscriber<T> internal constructor(private val onNextFunction: (T) -> 
     }
 
     override fun onCancel() {
+    }
+}
+
+//FIXME: Make this class thread-safe
+internal class BlockingLastSubscriber<T>: Subscriber<T> {
+    private var latestElement: T? = null
+    private var isFinished = false
+    private val countDownLatch = CountDownLatch(1)
+
+    override fun onNext(element: T) {
+        latestElement = element
+    }
+
+    override fun onComplete() {
+        isFinished = true
+        countDownLatch.countDown()
+    }
+
+    override fun onCancel() = onComplete()
+
+    fun subscribeTo(publisher: Publisher<T>): T {
+        publisher.subscribe(this)
+
+        if (isFinished.not()) {
+            countDownLatch.await()
+        }
+
+        return latestElement ?: throw IllegalStateException("Publisher failed to publish any values")
     }
 }
 
