@@ -24,6 +24,7 @@ package bill.reactive
 
 import android.os.Handler
 import android.os.Looper
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -33,10 +34,21 @@ internal class SignalOnThreadProcessor<T>(origin: Publisher<T>, private val thre
             super.onNext(element)
         }
     }
+
+    override fun onCancel() {
+        threadWorker.dispose()
+        super.onCancel()
+    }
+
+    override fun onComplete() {
+        threadWorker.dispose()
+        super.onComplete()
+    }
 }
 
 internal interface ThreadWorker {
     fun run(action: () -> Unit)
+    fun dispose()
 }
 
 internal class BackgroundThreadWorker : ThreadWorker {
@@ -47,6 +59,12 @@ internal class BackgroundThreadWorker : ThreadWorker {
             action()
         } else {
             threadPool.submit(action)
+        }
+    }
+
+    override fun dispose() {
+        if (TestMode.isEnabled.not()) {
+            threadPool.shutdown()
         }
     }
 }
@@ -60,6 +78,9 @@ internal class ForegroundThreadWorker : ThreadWorker {
         } else {
             mainHandler.post(action)
         }
+    }
+
+    override fun dispose() {
     }
 }
 
