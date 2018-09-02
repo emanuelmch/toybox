@@ -32,11 +32,14 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 
-class HomePresenter(private val view: HomeView, context: Context) {
+class HomePresenter(private val view: HomeView,
+                    private val game: GameEngine,
+                    private val navigator: Navigator,
+                    private val settings: SettingsRepository
+) {
 
-    private val game = GameEngine()
-    private val navigator = Navigator(context)
-    private val settings = SettingsRepository(context)
+    constructor(view: HomeView, context: Context)
+            : this(view, GameEngine(), Navigator(context), SettingsRepository(context))
 
     private val disposables = CompositeDisposable()
 

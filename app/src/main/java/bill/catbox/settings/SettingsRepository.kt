@@ -29,11 +29,11 @@ import io.reactivex.Observable
 
 private const val boxCountPreference = "pref_boxCount"
 
-class SettingsRepository(context: Context) {
+open class SettingsRepository(context: Context) {
 
     private val watcher = PreferenceWatcher(context)
 
-    fun watchBoxCount() = watcher.watchInt(boxCountPreference)
+    open fun watchBoxCount() = watcher.watchInt(boxCountPreference)
 }
 
 class PreferenceWatcher(private val sharedPrefs: SharedPreferences) {

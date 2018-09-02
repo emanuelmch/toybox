@@ -24,7 +24,7 @@ package bill.catbox.game
 
 import timber.log.Timber
 
-class GameEngine {
+open class GameEngine {
 
     fun newGame(boxCount: Int) = GameState(boxCount)
 
