@@ -20,11 +20,18 @@
  * SOFTWARE.
  */
 
-package bill.catbox.test
+package bill.reactive
 
-import org.mockito.Mockito
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Test
 
-@Suppress("UNCHECKED_CAST")
-fun <T> nonNull(): T {
-    return Mockito.notNull() ?: (null as T)
+class SubscribersTests {
+
+    @Test
+    fun `blockingLast should return the latest value published`() {
+        val result = Publishers.elements(1, 2, 3).blockingLast()
+
+        assertThat(result, `is`(3))
+    }
 }

@@ -20,11 +20,15 @@
  * SOFTWARE.
  */
 
-package bill.catbox.test
+package bill.reactive
 
-import org.mockito.Mockito
+import java.util.concurrent.TimeUnit
 
-@Suppress("UNCHECKED_CAST")
-fun <T> nonNull(): T {
-    return Mockito.notNull() ?: (null as T)
-}
+internal class SignalOnThreadProcessor<T>(origin: Publisher<T>, threadWorker: ThreadWorker) : BaseProcessor<T>(origin)
+
+internal interface ThreadWorker
+
+internal class BackgroundThreadWorker() : ThreadWorker
+internal class ForegroundThreadWorker() : ThreadWorker
+
+internal class DelayProcessor<T>(origin: Publisher<T>, delay: Long, unit: TimeUnit) : BaseProcessor<T>(origin)

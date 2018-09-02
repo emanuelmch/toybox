@@ -44,10 +44,10 @@ internal abstract class BasePublisher<T> : Publisher<T> {
     override fun <V> map(function: (T) -> V) = MapperProcessor(this, function)
     override fun startWith(element: T) = StartWithProcessor(this, element)
 
-    override fun delay(delay: Long, unit: TimeUnit) = this
-    override fun signalOnBackground() = this
-    override fun signalOnForeground() = this
-    override fun blockingLast() = BlockingLastSubscriber<T>().subscribeTo(this)
+    override fun delay(delay: Long, unit: TimeUnit) = DelayProcessor(this, delay, unit)
+    override fun signalOnBackground() = SignalOnThreadProcessor(this, BackgroundThreadWorker())
+    override fun signalOnForeground() = SignalOnThreadProcessor(this, ForegroundThreadWorker())
+    override fun blockingLast(): T = BlockingLastSubscriber<T>().subscribeTo(this)
 
     override fun doOnNext(action: (T) -> Unit) = DoOnNextProcessor(this, action)
     override fun doOnFinish(action: () -> Unit) = DoOnFinishProcessor(this, action)

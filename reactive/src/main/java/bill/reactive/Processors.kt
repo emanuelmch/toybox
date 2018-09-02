@@ -41,7 +41,7 @@ internal open class BaseProcessor<T>(protected val origin: Publisher<T>) : BaseP
     override fun onCancel() = subscriber.onCancel()
 }
 
-internal abstract class BaseMappingProcessor<T, V>(protected val origin: Publisher<T>) : BasePublisher<V>(), Processor<T, V> {
+internal abstract class BaseMappingProcessor<T, V>(private val origin: Publisher<T>) : BasePublisher<V>(), Processor<T, V> {
 
     private lateinit var subscriber: Subscriber<V>
     protected abstract fun map(element: T): V

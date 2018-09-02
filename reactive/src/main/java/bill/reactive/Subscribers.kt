@@ -22,10 +22,10 @@
 
 package bill.reactive
 
-import java.lang.IllegalStateException
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Semaphore
 
-class BaseSubscriber<T> internal constructor(private val onNextFunction: (T) -> Unit):Subscriber<T> {
+internal class BaseSubscriber<T>(private val onNextFunction: (T) -> Unit) : Subscriber<T> {
 
     override fun onNext(element: T) {
         onNextFunction(element)
@@ -38,14 +38,14 @@ class BaseSubscriber<T> internal constructor(private val onNextFunction: (T) -> 
     }
 }
 
-//FIXME: Make this class thread-safe
-internal class BlockingLastSubscriber<T>: Subscriber<T> {
-    private var latestElement: T? = null
+//FIXME: Make this thread-safe
+internal class BlockingLastSubscriber<T> : Subscriber<T> {
+    private var latestValue: T? = null
     private var isFinished = false
     private val countDownLatch = CountDownLatch(1)
 
     override fun onNext(element: T) {
-        latestElement = element
+        latestValue = element
     }
 
     override fun onComplete() {
@@ -53,7 +53,10 @@ internal class BlockingLastSubscriber<T>: Subscriber<T> {
         countDownLatch.countDown()
     }
 
-    override fun onCancel() = onComplete()
+    override fun onCancel() {
+        isFinished = true
+        countDownLatch.countDown()
+    }
 
     fun subscribeTo(publisher: Publisher<T>): T {
         publisher.subscribe(this)
@@ -62,11 +65,11 @@ internal class BlockingLastSubscriber<T>: Subscriber<T> {
             countDownLatch.await()
         }
 
-        return latestElement ?: throw IllegalStateException("Publisher failed to publish any values")
+        return latestValue ?: throw IllegalStateException("Publisher failed to publish any values")
     }
 }
 
-class TestSubscriber<T> internal constructor(publisher: Publisher<T>){
+class TestSubscriber<T> internal constructor(publisher: Publisher<T>) {
 
     private val emittedValues = mutableListOf<T>()
     private val subscription: Subscription

@@ -41,7 +41,7 @@ import org.mockito.MockitoAnnotations
 class HomePresenterTests {
 
     @get:Rule
-    val reactivesRule = ReactiveTestRule()
+    val reactiveTestRule = ReactiveTestRule()
 
     @Mock(answer = Answers.RETURNS_MOCKS)
     private lateinit var view: HomeView
