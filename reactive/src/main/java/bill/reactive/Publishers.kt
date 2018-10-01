@@ -50,6 +50,7 @@ internal abstract class BasePublisher<T> : Publisher<T> {
     override fun blockingLast(): T = BlockingLastSubscriber<T>().subscribeTo(this)
 
     override fun doOnNext(action: (T) -> Unit) = DoOnNextProcessor(this, action)
+    override fun doOnCancel(action: () -> Unit) = DoOnCancelProcessor(this, action)
     override fun doOnFinish(action: () -> Unit) = DoOnFinishProcessor(this, action)
 }
 

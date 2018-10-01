@@ -43,6 +43,7 @@ interface Publisher<T> {
 
     // Events
     fun doOnNext(action: (T) -> Unit) : Publisher<T>
+    fun doOnCancel(action: () -> Unit) : Publisher<T>
     fun doOnFinish(action: () -> Unit): Publisher<T>
 }
 

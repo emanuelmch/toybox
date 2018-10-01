@@ -22,44 +22,20 @@
 
 package bill.reactive
 
+import bill.reactive.test.MockNotifier
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Test
 
-class ProcessorTests {
+class NotifiersTests {
 
     @Test
-    fun `distinctUntilChanged publishes repeating emissions`() {
-        Publishers.elements(1, 1, 2)
-                .distinctUntilChanged()
-                .test()
-                .assertNoErrors()
-                .assertValuesOnly(1, 2)
-    }
-
-    @Test
-    fun `map publishes the value created by the mapping function`() {
-        Publishers.elements(1)
-                .map { it * 2 }
-                .test()
-                .assertNoErrors()
-                .assertValuesOnly(2)
-    }
-
-    @Test
-    fun `startWith publishes the initial value first`() {
-        Publishers.elements(1)
-                .startWith(0)
-                .test()
-                .assertNoErrors()
-                .assertValuesOnly(0, 1)
-    }
-
-    @Test
-    fun `doOnNext runs its function whenever something is published`() {
+    fun `onSubscribe creates a Notifier that runs the setup function when you subscribe to it`() {
         var hasBeenCalled = false
-        Publishers.elements(Unit)
-                .doOnNext { hasBeenCalled = true }
+        Notifiers
+                .onSubscribe { hasBeenCalled = true }
                 .subscribe()
 
         assertThat(hasBeenCalled, `is`(true))
@@ -67,29 +43,15 @@ class ProcessorTests {
 
 
     @Test
-    fun `doOnNext doesn't runs its function when nothing is published`() {
-        var hasBeenCalled = false
-        Publishers.elements<Unit>()
-                .doOnNext { hasBeenCalled = true }
-                .subscribe()
-
-        assertThat(hasBeenCalled, `is`(false))
-    }
-
-    @Test
-    fun `doOnFinish runs its function when the Publisher succeeds`() {
-        var hasBeenCalled = false
-        Publishers.elements(Unit)
-                .doOnFinish { hasBeenCalled = true }
-                .subscribe()
-
-        assertThat(hasBeenCalled, `is`(true))
+    @Ignore("Feature not yet needed")
+    fun `doOnFinish runs its function when the Publisher completes`() {
+        Assert.fail("Test not implemented yet")
     }
 
     @Test
     fun `doOnFinish runs its function when the Publisher is cancelled`() {
         var hasBeenCalled = false
-        Publishers.onSubscribe<Unit> { }
+        Notifiers.onSubscribe { }
                 .doOnFinish { hasBeenCalled = true }
                 .subscribe()
                 .cancel()
@@ -100,32 +62,52 @@ class ProcessorTests {
     @Test
     fun `doOnFinish doesn't run its function when the Publisher is left open`() {
         var hasBeenCalled = false
-        Publishers.onSubscribe<Unit> { }
+        Notifiers.onSubscribe { }
                 .doOnFinish { hasBeenCalled = true }
                 .subscribe()
 
         assertThat(hasBeenCalled, `is`(false))
     }
+}
+
+@Suppress("ClassName")
+class `Notifiers - toPublisher Tests` {
 
     @Test
-    fun `doOnCancel runs its functions when the Publisher is cancelled`() {
+    fun `toPublisher subscribes to the source when subscribed to`() {
         var hasBeenCalled = false
-        Publishers.onSubscribe<Unit> { }
-                .doOnCancel { hasBeenCalled = true }
+        Notifiers.onSubscribe { hasBeenCalled = true }
+                .toPublisher { }
                 .subscribe()
-                .cancel()
 
         assertThat(hasBeenCalled, `is`(true))
     }
 
+    @Test
+    fun `toPublisher cancels the source when cancelled`() {
+        val notifier = MockNotifier()
+        notifier.toPublisher {}
+                .subscribe()
+                .cancel()
+
+        assertThat(notifier.cancelled, `is`(true))
+    }
 
     @Test
-    fun `doOnCancel doesn't run its function when the Publisher is left open`() {
-        var hasBeenCalled = false
-        Publishers.onSubscribe<Unit> { }
-                .doOnCancel { hasBeenCalled = true }
-                .subscribe()
+    @Ignore("Feature not yet needed")
+    fun `toPublisher is completed when the source is`() {
+        Assert.fail("Test not implemented yet")
+    }
 
-        assertThat(hasBeenCalled, `is`(false))
+    @Test
+    fun `toPublisher emits the value created by the factory function`() {
+        Notifiers
+                .onSubscribe {
+                    it.onNext()
+                    it.onNext()
+                }
+                .toPublisher { 1 }
+                .test()
+                .assertValuesOnly(1, 1)
     }
 }

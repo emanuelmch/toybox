@@ -92,6 +92,14 @@ internal class DoOnNextProcessor<T>(origin: Publisher<T>, private val action: (T
     }
 }
 
+internal class DoOnCancelProcessor<T>(origin: Publisher<T>, private val action: () -> Unit) : BaseProcessor<T>(origin) {
+
+    override fun onCancel() {
+        action()
+        super.onCancel()
+    }
+}
+
 internal class DoOnFinishProcessor<T>(origin: Publisher<T>, private val action: () -> Unit) : BaseProcessor<T>(origin) {
 
     override fun onComplete() {

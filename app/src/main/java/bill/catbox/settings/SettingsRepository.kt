@@ -25,8 +25,8 @@ package bill.catbox.settings
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import bill.reactive.Notifiers
 import bill.reactive.Publisher
-import bill.reactive.Publishers
 
 private const val boxCountPreference = "pref_boxCount"
 
@@ -43,18 +43,18 @@ class PreferenceWatcher(private val sharedPrefs: SharedPreferences) {
 
     fun watchInt(key: String, defaultValue: Int = 0): Publisher<Int> {
         lateinit var callback: SharedPreferences.OnSharedPreferenceChangeListener
-        return Publishers
-                .onSubscribe<Unit> { subscriber ->
+        return Notifiers
+                .onSubscribe { subscriber ->
                     callback = SharedPreferences.OnSharedPreferenceChangeListener { _, changedKey ->
-                        if (changedKey == key) subscriber.onNext(Unit)
+                        if (changedKey == key) subscriber.onNext()
                     }
 
                     sharedPrefs.registerOnSharedPreferenceChangeListener(callback)
 
-                    subscriber.onNext(Unit)
+                    subscriber.onNext()
                 }
                 .doOnFinish { sharedPrefs.unregisterOnSharedPreferenceChangeListener(callback) }
-                .map { sharedPrefs.getInt(key, defaultValue) }
+                .toPublisher { sharedPrefs.getInt(key, defaultValue) }
                 .distinctUntilChanged()
     }
 }
