@@ -22,8 +22,8 @@
 
 package bill.reactive
 
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 class PublishersTests {
@@ -42,6 +42,6 @@ class PublishersTests {
                 .onSubscribe<Unit> { hasBeenCalled = true }
                 .subscribe()
 
-        MatcherAssert.assertThat(hasBeenCalled, CoreMatchers.`is`(true))
+        assertThat(hasBeenCalled, `is`(true))
     }
 }

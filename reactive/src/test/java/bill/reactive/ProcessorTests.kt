@@ -29,7 +29,7 @@ import org.junit.Test
 class ProcessorTests {
 
     @Test
-    fun `distinctUntilChanged publishes repeating emissions`() {
+    fun `distinctUntilChanged doesn't emit repeating emissions`() {
         Publishers.elements(1, 1, 2)
                 .distinctUntilChanged()
                 .test()
@@ -38,7 +38,7 @@ class ProcessorTests {
     }
 
     @Test
-    fun `map publishes the value created by the mapping function`() {
+    fun `map emits the value created by the mapping function`() {
         Publishers.elements(1)
                 .map { it * 2 }
                 .test()
@@ -47,7 +47,7 @@ class ProcessorTests {
     }
 
     @Test
-    fun `startWith publishes the initial value first`() {
+    fun `startWith emits the initial value first`() {
         Publishers.elements(1)
                 .startWith(0)
                 .test()
@@ -64,7 +64,6 @@ class ProcessorTests {
 
         assertThat(hasBeenCalled, `is`(true))
     }
-
 
     @Test
     fun `doOnNext doesn't runs its function when nothing is published`() {
