@@ -106,13 +106,13 @@ private open class MockSharedPreferences : SharedPreferences {
     }
 
     override fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener?) {
-        if (listener == null) return
+        if (listener == null) throw IllegalArgumentException("Listener can't be null")
 
         listeners.add(listener)
     }
 
     override fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener?) {
-        if (listener == null) return
+        if (listener == null) throw IllegalArgumentException("Listener can't be null")
 
         val wasRemoved = listeners.remove(listener)
         if (wasRemoved.not()) {
