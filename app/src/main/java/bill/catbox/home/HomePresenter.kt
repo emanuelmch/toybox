@@ -23,13 +23,16 @@
 package bill.catbox.home
 
 import android.content.Context
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import bill.catbox.game.GameEngine
 import bill.catbox.game.GameState
 import bill.catbox.navigation.Navigator
 import bill.catbox.settings.SettingsRepository
-import bill.reactive.SubscriptionBag
 import bill.reactive.Publisher
 import bill.reactive.Publishers
+import bill.reactive.SubscriptionBag
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -37,13 +40,14 @@ class HomePresenter(private val view: HomeView,
                     private val game: GameEngine,
                     private val navigator: Navigator,
                     private val settings: SettingsRepository
-) {
+): LifecycleObserver {
 
     constructor(view: HomeView, context: Context)
             : this(view, GameEngine(), Navigator(context), SettingsRepository(context))
 
     private val disposables = SubscriptionBag()
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun attach() {
         Timber.d("Presenter::attach")
 
@@ -82,6 +86,7 @@ class HomePresenter(private val view: HomeView,
                 .subscribe(navigator::navigateFromMenu)
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun detach() {
         Timber.d("Presenter::detach")
         disposables.clear()

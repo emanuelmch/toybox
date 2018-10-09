@@ -41,7 +41,6 @@ import timber.log.Timber
 
 class HomeActivity : AppCompatActivity(), HomeView {
 
-    private val presenter by lazy { HomePresenter(this, this) }
     private val boxAdapter by lazy { BoxAdapter().apply { boxes.adapter = this } }
 
     override val menuSelectedEvent = Processors.cold<Int>()
@@ -50,21 +49,12 @@ class HomeActivity : AppCompatActivity(), HomeView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_activity)
+        lifecycle.addObserver(HomePresenter(this, this))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main, menu)
         return true
-    }
-
-    override fun onResume() {
-        super.onResume()
-        presenter.attach()
-    }
-
-    override fun onPause() {
-        presenter.detach()
-        super.onPause()
     }
 
     override fun startGame(boxCount: Int) {
