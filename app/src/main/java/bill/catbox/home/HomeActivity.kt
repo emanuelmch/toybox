@@ -34,7 +34,7 @@ import bill.catbox.R
 import bill.catbox.infra.inflateChild
 import bill.catbox.infra.snackbar
 import bill.catbox.infra.toOrdinal
-import bill.reactive.Processors
+import bill.reaktive.Processors
 import kotlinx.android.synthetic.main.home_activity.*
 import kotlinx.android.synthetic.main.home_item.view.*
 import timber.log.Timber

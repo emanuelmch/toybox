@@ -29,7 +29,7 @@ import bill.catbox.navigation.Navigator
 import bill.catbox.settings.SettingsRepository
 import bill.catbox.test.ReactiveTestRule
 import bill.catbox.test.nonNull
-import bill.reactive.Publishers
+import bill.reaktive.Publishers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

@@ -25,8 +25,8 @@ package bill.catbox.settings
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import bill.reactive.Notifiers
-import bill.reactive.Publisher
+import bill.reaktive.Notifiers
+import bill.reaktive.Publisher
 
 private const val boxCountPreference = "pref_boxCount"
 

@@ -35,7 +35,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime:2.0.0'
     implementation 'com.google.android.material:material:1.0.0'
 
-    implementation project(':reactive')
+    implementation project(':reaktive:reaktive')
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
 

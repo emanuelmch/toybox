@@ -30,9 +30,9 @@ import bill.catbox.game.GameEngine
 import bill.catbox.game.GameState
 import bill.catbox.navigation.Navigator
 import bill.catbox.settings.SettingsRepository
-import bill.reactive.Publisher
-import bill.reactive.Publishers
-import bill.reactive.SubscriptionBag
+import bill.reaktive.Publisher
+import bill.reaktive.Publishers
+import bill.reaktive.SubscriptionBag
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
