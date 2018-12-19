@@ -24,81 +24,21 @@ package bill.catbox.home
 
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
 import bill.catbox.R
-import bill.catbox.infra.inflateChild
-import bill.catbox.infra.snackbar
-import bill.catbox.infra.toOrdinal
-import bill.reaktive.Processors
+import bill.catbox.infra.ViewControllerActivity
 import kotlinx.android.synthetic.main.home_activity.*
-import kotlinx.android.synthetic.main.home_item.view.*
-import timber.log.Timber
 
-class HomeActivity : AppCompatActivity(), HomeView {
-
-    private val boxAdapter by lazy { BoxAdapter().apply { boxes.adapter = this } }
-
-    override val menuSelectedEvent = Processors.cold<Int>()
-    override val boxChosenEvent = Processors.cold<Int>()
+class HomeActivity : ViewControllerActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_activity)
-        lifecycle.addObserver(HomePresenter(this, this))
+
+        lifecycle.addObserver(HomePresenter(homeRoot, this))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main, menu)
         return true
-    }
-
-    override fun startGame(boxCount: Int) {
-        Timber.d("Starting the game with $boxCount boxes")
-        boxAdapter.boxCount = boxCount
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        menuSelectedEvent.onNext(item.itemId)
-        return true
-    }
-
-    override fun onCatFound(attempts: Int) {
-        boxes.snackbar(resources.getQuantityString(R.plurals.cat_found, attempts, attempts))
-    }
-
-    override fun onEmptyBox(attempts: Int) {
-        boxes.snackbar(getString(R.string.empty_box, attempts.toOrdinal()))
-    }
-
-    private inner class BoxAdapter : RecyclerView.Adapter<BoxViewHolder>() {
-
-        var boxCount = 0
-            set(value) {
-                field = value
-                notifyDataSetChanged()
-            }
-
-        override fun getItemCount() = boxCount
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-                BoxViewHolder(parent.inflateChild(R.layout.home_item))
-
-        override fun onBindViewHolder(holder: BoxViewHolder, position: Int) {
-            holder.bind(position)
-        }
-    }
-
-    private inner class BoxViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val boxButton: Button = itemView.buttonBox
-
-        fun bind(position: Int) {
-            boxButton.text = getString(R.string.box_number, position + 1)
-            boxButton.setOnClickListener { boxChosenEvent.onNext(position) }
-        }
     }
 }

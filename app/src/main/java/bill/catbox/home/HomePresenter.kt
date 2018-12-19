@@ -30,7 +30,6 @@ import bill.catbox.game.GameEngine
 import bill.catbox.game.GameState
 import bill.catbox.navigation.Navigator
 import bill.catbox.settings.SettingsRepository
-import bill.reaktive.Publisher
 import bill.reaktive.Publishers
 import bill.reaktive.SubscriptionBag
 import timber.log.Timber
@@ -40,7 +39,7 @@ class HomePresenter(private val view: HomeView,
                     private val game: GameEngine,
                     private val navigator: Navigator,
                     private val settings: SettingsRepository
-): LifecycleObserver {
+) : LifecycleObserver {
 
     constructor(view: HomeView, context: Context)
             : this(view, GameEngine(), Navigator(context), SettingsRepository(context))
@@ -91,13 +90,4 @@ class HomePresenter(private val view: HomeView,
         Timber.d("Presenter::detach")
         disposables.clear()
     }
-}
-
-interface HomeView {
-    val boxChosenEvent: Publisher<Int>
-    val menuSelectedEvent: Publisher<Int>
-
-    fun onCatFound(attempts: Int)
-    fun onEmptyBox(attempts: Int)
-    fun startGame(boxCount: Int)
 }
