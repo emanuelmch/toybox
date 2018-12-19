@@ -46,7 +46,7 @@ class PreferenceWatcherTest {
         verify(sharedPrefs).registerOnSharedPreferenceChangeListener(any())
         verify(sharedPrefs, never()).unregisterOnSharedPreferenceChangeListener(any())
 
-        disposable.dispose()
+        disposable.cancel()
 
         verify(sharedPrefs).unregisterOnSharedPreferenceChangeListener(any())
     }
@@ -58,7 +58,7 @@ class PreferenceWatcherTest {
                 .test()
 
         subscriber.assertValuesOnly(1984)
-        subscriber.dispose()
+        subscriber.cancel()
         subscriber.assertNoErrors()
     }
 
@@ -69,7 +69,7 @@ class PreferenceWatcherTest {
         sharedPrefs.setInt("key", 124)
 
         subscriber.assertValuesOnly(123, 124)
-        subscriber.dispose()
+        subscriber.cancel()
         subscriber.assertNoErrors()
     }
 
@@ -82,13 +82,13 @@ class PreferenceWatcherTest {
         sharedPrefs.setInt("key", 125)
 
         subscriber1.assertValuesOnly(123, 124, 125)
-        subscriber1.dispose()
+        subscriber1.cancel()
         subscriber1.assertNoErrors()
 
         sharedPrefs.setInt("key", 126)
 
         subscriber2.assertValuesOnly(124, 125, 126)
-        subscriber2.dispose()
+        subscriber2.cancel()
         subscriber2.assertNoErrors()
     }
 }
@@ -106,13 +106,13 @@ private open class MockSharedPreferences : SharedPreferences {
     }
 
     override fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener?) {
-        if (listener == null) return
+        if (listener == null) throw IllegalArgumentException("Listener can't be null")
 
         listeners.add(listener)
     }
 
     override fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener?) {
-        if (listener == null) return
+        if (listener == null) throw IllegalArgumentException("Listener can't be null")
 
         val wasRemoved = listeners.remove(listener)
         if (wasRemoved.not()) {

@@ -23,10 +23,7 @@
 package bill.catbox
 
 import android.app.Application
-import android.os.Looper
 import android.preference.PreferenceManager
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 
 @Suppress("unused")
@@ -35,18 +32,10 @@ class CatBoxApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        setupExperimentalRxJavaScheduler()
-
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
-    }
-
-    private fun setupExperimentalRxJavaScheduler() {
-        val asyncMainThreadScheduler = AndroidSchedulers.from(Looper.getMainLooper(), true)
-        //RxAndroidPlugins.setInitMainThreadSchedulerHandler { asyncMainThreadScheduler }
-        RxAndroidPlugins.setMainThreadSchedulerHandler { asyncMainThreadScheduler }
     }
 }

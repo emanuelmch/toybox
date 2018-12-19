@@ -20,11 +20,22 @@
  * SOFTWARE.
  */
 
-package bill.catbox.infra
+package bill.catbox.test
 
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+import bill.reaktive.TestMode
+import org.junit.rules.TestRule
+import org.junit.runner.Description
+import org.junit.runners.model.Statement
 
-operator fun CompositeDisposable.plusAssign(disposable: Disposable) {
-    this.add(disposable)
+class ReactiveTestRule : TestRule {
+
+    override fun apply(base: Statement, description: Description?) = object: Statement() {
+        override fun evaluate() {
+            TestMode.isEnabled = true
+
+            base.evaluate()
+
+            TestMode.isEnabled = false
+        }
+    }
 }

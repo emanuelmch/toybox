@@ -1,0 +1,3 @@
+[submodule "reaktive"]
+	path = reaktive
+	url = https://github.com/emanuelmch/reaktive.git

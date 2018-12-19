@@ -5,13 +5,13 @@ android:
     - tools
     - platform-tools
     - tools
-    - build-tools-27.0.3
-    - android-21
+    - build-tools-28.0.3
+    - android-19
     - android-28
-    - sys-img-armeabi-v7a-google_apis-21
+    - sys-img-armeabi-v7a-google_apis-19
 
 before_script:
-  - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a --tag google_apis
+  - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a --tag google_apis
   - QEMU_AUDIO_DRV=none emulator -avd test -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &

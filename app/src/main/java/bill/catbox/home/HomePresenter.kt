@@ -23,26 +23,31 @@
 package bill.catbox.home
 
 import android.content.Context
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import bill.catbox.game.GameEngine
 import bill.catbox.game.GameState
-import bill.catbox.infra.plusAssign
 import bill.catbox.navigation.Navigator
 import bill.catbox.settings.SettingsRepository
-import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
+import bill.reaktive.Publisher
+import bill.reaktive.Publishers
+import bill.reaktive.SubscriptionBag
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class HomePresenter(private val view: HomeView,
                     private val game: GameEngine,
                     private val navigator: Navigator,
                     private val settings: SettingsRepository
-) {
+): LifecycleObserver {
 
     constructor(view: HomeView, context: Context)
             : this(view, GameEngine(), Navigator(context), SettingsRepository(context))
 
-    private val disposables = CompositeDisposable()
+    private val disposables = SubscriptionBag()
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun attach() {
         Timber.d("Presenter::attach")
 
@@ -56,9 +61,20 @@ class HomePresenter(private val view: HomeView,
                 }
 
         disposables += view.boxChosenEvent
-                .subscribe {
+                .signalOnBackground()
+                .doOnNext {
                     Timber.d("Box #$it chosen")
                     gameState = game.play(gameState, it)
+                }
+                .map {
+                    if (gameState.isCatFound) {
+                        Publishers.elements(it).delay(2, TimeUnit.SECONDS).blockingLast()
+                    } else {
+                        it
+                    }
+                }
+                .signalOnForeground()
+                .subscribe {
                     if (gameState.isCatFound) {
                         view.onCatFound(gameState.moveCount)
                     } else {
@@ -70,6 +86,7 @@ class HomePresenter(private val view: HomeView,
                 .subscribe(navigator::navigateFromMenu)
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun detach() {
         Timber.d("Presenter::detach")
         disposables.clear()
@@ -77,8 +94,8 @@ class HomePresenter(private val view: HomeView,
 }
 
 interface HomeView {
-    val boxChosenEvent: Observable<Int>
-    val menuSelectedEvent: Observable<Int>
+    val boxChosenEvent: Publisher<Int>
+    val menuSelectedEvent: Publisher<Int>
 
     fun onCatFound(attempts: Int)
     fun onEmptyBox(attempts: Int)
