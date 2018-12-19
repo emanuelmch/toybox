@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,25 +20,34 @@
  * SOFTWARE.
  */
 
-package bill.catbox.home
+package bill.catbox.infra
 
-import android.os.Bundle
-import android.view.Menu
-import bill.catbox.R
-import bill.catbox.infra.ViewControllerActivity
-import kotlinx.android.synthetic.main.home_activity.*
+import android.content.Context
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import bill.reaktive.OpenPublisher
+import bill.reaktive.Publisher
+import bill.reaktive.Publishers
 
-class HomeActivity : ViewControllerActivity() {
+interface ViewController {
+    val context: Context
+    val optionsItemSelected: Publisher<Int>
+}
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.home_activity)
+abstract class ViewControllerActivity : AppCompatActivity(), ViewController {
+    private val optionsItemSelectedProcessor: OpenPublisher<Int> by lazy { Publishers.open<Int>() }
 
-        lifecycle.addObserver(HomePresenter(homeRoot, this))
-    }
+    final override val context
+        get() = this
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
+    final override val optionsItemSelected: Publisher<Int>
+        get() = optionsItemSelectedProcessor
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        item?.itemId?.let { optionsItemSelectedProcessor.onNext(it) }
         return true
     }
 }
+
+val Context.optionsItemSelected: Publisher<Int>
+    get() = (this as? ViewController)?.optionsItemSelected ?: Publishers.empty()
