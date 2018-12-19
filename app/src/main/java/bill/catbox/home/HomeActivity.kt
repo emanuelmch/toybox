@@ -26,13 +26,13 @@ import android.os.Bundle
 import android.view.Menu
 import bill.catbox.R
 import bill.catbox.infra.ViewControllerActivity
-import kotlinx.android.synthetic.main.home_activity.*
+import kotlinx.android.synthetic.main.home_view.*
 
 class HomeActivity : ViewControllerActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.home_activity)
+        setContentView(R.layout.home_view)
 
         lifecycle.addObserver(HomePresenter(homeRoot, this))
     }
