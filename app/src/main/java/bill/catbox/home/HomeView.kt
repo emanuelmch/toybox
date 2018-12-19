@@ -24,7 +24,6 @@ package bill.catbox.home
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -54,7 +53,6 @@ class AndroidHomeView @JvmOverloads constructor(context: Context, attrs: Attribu
 
     init {
         assert(context is ViewController) { "HomeView is in an invalid context" }
-        LayoutInflater.from(context).inflate(R.layout.home_view, this, true)
     }
 
     private val boxAdapter by lazy { BoxAdapter().apply { boxes.adapter = this } }
