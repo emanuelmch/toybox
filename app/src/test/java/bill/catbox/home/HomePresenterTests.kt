@@ -28,38 +28,30 @@ import bill.catbox.game.GameState
 import bill.catbox.navigation.Navigator
 import bill.catbox.settings.SettingsRepository
 import bill.catbox.test.ReactiveTestRule
-import bill.catbox.test.nonNull
 import bill.reaktive.Publishers
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Answers
-import org.mockito.Mock
-import org.mockito.Mockito.*
-import org.mockito.MockitoAnnotations
 
 class HomePresenterTests {
 
     @get:Rule
     val reactiveTestRule = ReactiveTestRule()
 
-    @Mock(answer = Answers.RETURNS_MOCKS)
     private lateinit var view: HomeView
-
-    @Mock
     private lateinit var game: GameEngine
-
-    @Mock
-    private lateinit var navigator: Navigator
-
-    @Mock(answer = Answers.RETURNS_MOCKS)
-    private lateinit var settingsRepository: SettingsRepository
 
     private lateinit var presenter: HomePresenter
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        view = mockk(relaxed = true)
+        game = mockk(relaxed = true)
+        val navigator: Navigator = mockk(relaxed = true)
+        val settingsRepository: SettingsRepository = mockk(relaxed = true)
 
         presenter = HomePresenter(view, game, navigator, settingsRepository)
     }
@@ -74,14 +66,19 @@ class HomePresenterTests {
 
     @Test
     fun `should call view_onCatFound when cat is found`() {
-        `when`(view.boxChosenEvent).thenReturn(Publishers.elements(0))
+        //FIXME: Should be a TestOpenPublisher that's actually closed
+        val boxChosenEvents = Publishers.open<Int>()
+        every { view.boxChosenEvent } returns boxChosenEvents
 
         val catFoundGameNode = GameNode(listOf(0), listOf(0))
         val catFoundState = GameState(1, listOf(catFoundGameNode))
-        `when`(game.play(nonNull(), anyInt())).thenReturn(catFoundState)
+        every { game.play(any(), any()) } returns catFoundState
 
         presenter.attach()
+        boxChosenEvents.onNext(0)
 
-        verify(view).onCatFound(anyInt())
+        verify {
+            view.onCatFound(any())
+        }
     }
 }

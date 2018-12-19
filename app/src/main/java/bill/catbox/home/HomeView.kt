@@ -31,45 +31,35 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import bill.catbox.R
 import bill.catbox.infra.*
-import bill.reaktive.Publisher
 import bill.reaktive.Publishers
 import kotlinx.android.synthetic.main.home_item.view.*
 import kotlinx.android.synthetic.main.home_view.view.*
 import timber.log.Timber
 import kotlin.properties.Delegates.observable
 
-// Not sure how I feel about separating this interface...
-interface HomeView {
-    val menuSelectedEvent: Publisher<Int>
-    val boxChosenEvent: Publisher<Int>
-
-    fun startGame(boxCount: Int)
-    fun onEmptyBox(attempts: Int)
-    fun onCatFound(attempts: Int)
-}
-
-class AndroidHomeView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
-        FrameLayout(context, attrs, defStyleAttr), HomeView {
+class HomeView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+        FrameLayout(context, attrs, defStyleAttr) {
 
     init {
         assert(context is ViewController) { "HomeView is in an invalid context" }
     }
 
     private val boxAdapter by lazy { BoxAdapter().apply { boxes.adapter = this } }
+    private val boxChosenOpenPublisher = Publishers.open<Int>()
 
-    override val menuSelectedEvent = context.optionsItemSelected
-    override val boxChosenEvent = Publishers.open<Int>()
+    val menuSelectedEvent = context.optionsItemSelected
+    val boxChosenEvent = boxChosenOpenPublisher
 
-    override fun startGame(boxCount: Int) {
+    fun startGame(boxCount: Int) {
         Timber.d("Starting the game with $boxCount boxes")
         boxAdapter.boxCount = boxCount
     }
 
-    override fun onEmptyBox(attempts: Int) {
+    fun onEmptyBox(attempts: Int) {
         snackbar(context.getString(R.string.empty_box, attempts.toOrdinal()))
     }
 
-    override fun onCatFound(attempts: Int) {
+    fun onCatFound(attempts: Int) {
         snackbar(context.resources.getQuantityString(R.plurals.cat_found, attempts, attempts))
     }
 
