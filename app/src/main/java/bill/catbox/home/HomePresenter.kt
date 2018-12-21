@@ -30,10 +30,8 @@ import bill.catbox.game.GameEngine
 import bill.catbox.game.GameState
 import bill.catbox.navigation.Navigator
 import bill.catbox.settings.SettingsRepository
-import bill.reaktive.Publishers
 import bill.reaktive.SubscriptionBag
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 class HomePresenter(private val view: HomeView,
                     private val game: GameEngine,
@@ -41,10 +39,10 @@ class HomePresenter(private val view: HomeView,
                     private val settings: SettingsRepository
 ) : LifecycleObserver {
 
-    constructor(view: HomeView, context: Context)
+    constructor(context: Context, view: HomeView)
             : this(view, GameEngine(), Navigator(context), SettingsRepository(context))
 
-    private val disposables = SubscriptionBag()
+    private val subscriptions = SubscriptionBag()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun attach() {
@@ -53,23 +51,21 @@ class HomePresenter(private val view: HomeView,
         // TODO: Remove this variable using a reduce Observable
         var gameState = GameState(0)
 
-        disposables += settings.watchBoxCount()
+        subscriptions += settings.watchBoxCount()
                 .subscribe {
                     gameState = game.newGame(it)
                     view.startGame(it)
                 }
 
-        disposables += view.boxChosenEvent
+        subscriptions += view.boxChosenEvent
                 .signalOnBackground()
                 .doOnNext {
                     Timber.d("Box #$it chosen")
                     gameState = game.play(gameState, it)
                 }
-                .map {
+                .doOnNext {
                     if (gameState.isCatFound) {
-                        Publishers.elements(it).delay(2, TimeUnit.SECONDS).blockingLast()
-                    } else {
-                        it
+                        Thread.sleep(2000)
                     }
                 }
                 .signalOnForeground()
@@ -81,13 +77,13 @@ class HomePresenter(private val view: HomeView,
                     }
                 }
 
-        disposables += view.menuSelectedEvent
+        subscriptions += view.menuSelectedEvent
                 .subscribe(navigator::navigateFromMenu)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun detach() {
         Timber.d("Presenter::detach")
-        disposables.clear()
+        subscriptions.clear()
     }
 }

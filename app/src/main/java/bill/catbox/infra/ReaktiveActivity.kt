@@ -7,18 +7,10 @@ import bill.reaktive.OpenPublisher
 import bill.reaktive.Publisher
 import bill.reaktive.Publishers
 
-interface ViewController {
-    val context: Context
-    val optionsItemSelected: Publisher<Int>
-}
-
-abstract class ViewControllerActivity : AppCompatActivity(), ViewController {
+abstract class ReaktiveActivity : AppCompatActivity() {
     private val optionsItemSelectedProcessor: OpenPublisher<Int> by lazy { Publishers.open<Int>() }
 
-    final override val context
-        get() = this
-
-    final override val optionsItemSelected: Publisher<Int>
+    val optionsItemSelected: Publisher<Int>
         get() = optionsItemSelectedProcessor
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -28,4 +20,4 @@ abstract class ViewControllerActivity : AppCompatActivity(), ViewController {
 }
 
 val Context.optionsItemSelected: Publisher<Int>
-    get() = (this as? ViewController)?.optionsItemSelected ?: Publishers.empty()
+    get() = (this as? ReaktiveActivity)?.optionsItemSelected ?: Publishers.empty()

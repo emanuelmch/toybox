@@ -25,16 +25,17 @@ package bill.catbox.home
 import android.os.Bundle
 import android.view.Menu
 import bill.catbox.R
-import bill.catbox.infra.ViewControllerActivity
+import bill.catbox.infra.ReaktiveActivity
 import kotlinx.android.synthetic.main.home_view.*
 
-class HomeActivity : ViewControllerActivity() {
+class HomeActivity : ReaktiveActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_view)
 
-        lifecycle.addObserver(HomePresenter(homeRoot, this))
+        val homeView = HomeView(homeRoot)
+        lifecycle.addObserver(HomePresenter(this, homeView))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
