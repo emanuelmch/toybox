@@ -30,7 +30,7 @@ import com.google.android.material.snackbar.Snackbar
 
 fun View.snackbar(text: String) {
     Snackbar.make(this, text, Snackbar.LENGTH_SHORT)
-            .apply { show() }
+            .apply(Snackbar::show)
 }
 
 // TODO: Should we ask for Context and get text from resources?

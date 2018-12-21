@@ -22,12 +22,8 @@
 
 package bill.catbox.home
 
-import android.content.Context
-import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import bill.catbox.R
 import bill.catbox.infra.*
@@ -37,18 +33,18 @@ import kotlinx.android.synthetic.main.home_view.view.*
 import timber.log.Timber
 import kotlin.properties.Delegates.observable
 
-class HomeView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
-        FrameLayout(context, attrs, defStyleAttr) {
+class HomeView(private val rootView: ViewGroup) {
+
+    private val context = rootView.context
+    private val boxAdapter = BoxAdapter()
 
     init {
-        assert(context is ViewController) { "HomeView is in an invalid context" }
+        assert(context is ReaktiveActivity) { "HomeView needs a ReaktiveActivity for menuSelectedEvent" }
+        rootView.boxes.adapter = boxAdapter
     }
 
-    private val boxAdapter by lazy { BoxAdapter().apply { boxes.adapter = this } }
-    private val boxChosenOpenPublisher = Publishers.open<Int>()
-
     val menuSelectedEvent = context.optionsItemSelected
-    val boxChosenEvent = boxChosenOpenPublisher
+    val boxChosenEvent = boxAdapter.boxClickedEvent
 
     fun startGame(boxCount: Int) {
         Timber.d("Starting the game with $boxCount boxes")
@@ -56,36 +52,38 @@ class HomeView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     }
 
     fun onEmptyBox(attempts: Int) {
-        snackbar(context.getString(R.string.empty_box, attempts.toOrdinal()))
+        rootView.snackbar(context.getString(R.string.empty_box, attempts.toOrdinal()))
     }
 
     fun onCatFound(attempts: Int) {
-        snackbar(context.resources.getQuantityString(R.plurals.cat_found, attempts, attempts))
+        rootView.snackbar(context.resources.getQuantityString(R.plurals.cat_found, attempts, attempts))
+    }
+}
+
+private class BoxAdapter : RecyclerView.Adapter<BoxViewHolder>() {
+
+    val boxClickedEvent = Publishers.open<Int>()
+
+    var boxCount: Int by observable(0) { _, _, _ ->
+        notifyDataSetChanged()
     }
 
-    private inner class BoxAdapter : RecyclerView.Adapter<BoxViewHolder>() {
+    override fun getItemCount() = boxCount
 
-        var boxCount: Int by observable(0) { _, _, _ ->
-            notifyDataSetChanged()
-        }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+            BoxViewHolder(parent.inflateChild(R.layout.home_item), boxClickedEvent::onNext)
 
-        override fun getItemCount() = boxCount
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-                BoxViewHolder(parent.inflateChild(R.layout.home_item))
-
-        override fun onBindViewHolder(holder: BoxViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BoxViewHolder, position: Int) =
             holder.bind(position)
-        }
-    }
+}
 
-    private inner class BoxViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+private class BoxViewHolder(itemView: View,
+                            private val boxChosenEvent: (Int) -> Unit) : RecyclerView.ViewHolder(itemView) {
 
-        private val boxButton: Button = itemView.buttonBox
-
-        fun bind(position: Int) {
-            boxButton.text = context.getString(R.string.box_number, position + 1)
-            boxButton.setOnClickListener { boxChosenEvent.onNext(position) }
+    fun bind(position: Int) {
+        itemView.boxButton.run {
+            text = itemView.context.getString(R.string.box_number, position + 1)
+            setOnClickListener { boxChosenEvent(position) }
         }
     }
 }
