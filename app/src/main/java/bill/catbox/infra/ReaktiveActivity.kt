@@ -14,8 +14,11 @@ abstract class ReaktiveActivity : AppCompatActivity() {
         get() = optionsItemSelectedProcessor
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        item?.itemId?.let { optionsItemSelectedProcessor.onNext(it) }
-        return true
+        if (item != null && optionsItemSelectedProcessor.hasSubscriber()) {
+            optionsItemSelectedProcessor.onNext(item.itemId)
+            return true
+        }
+        return false
     }
 }
 
