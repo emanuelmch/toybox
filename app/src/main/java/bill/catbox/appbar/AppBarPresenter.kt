@@ -20,29 +20,31 @@
  * SOFTWARE.
  */
 
-package bill.catbox.infra
+package bill.catbox.appbar
 
-import android.content.Context
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
-import bill.reaktive.OpenPublisher
-import bill.reaktive.Publisher
-import bill.reaktive.Publishers
+import bill.catbox.R
+import bill.catbox.infra.ObservableActivity
+import bill.catbox.settings.SettingsActivity
 
-abstract class ReaktiveActivity : AppCompatActivity() {
-    private val optionsItemSelectedProcessor: OpenPublisher<Int> by lazy { Publishers.open<Int>() }
+class AppBarPresenter {
 
-    val optionsItemSelected: Publisher<Int>
-        get() = optionsItemSelectedProcessor
+    fun observe(activity: ObservableActivity) {
+        activity.onOptionsItemSelectedListener = this::onOptionsItemSelected
+        activity.onDestroyListeners += this::onDestroy
+    }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item != null && optionsItemSelectedProcessor.hasSubscriber()) {
-            optionsItemSelectedProcessor.onNext(item.itemId)
+    private fun onOptionsItemSelected(context: ObservableActivity, item: MenuItem?): Boolean {
+        if (item?.itemId == R.id.actionSettings) {
+            SettingsActivity.startActivity(context)
             return true
         }
+
         return false
     }
-}
 
-val Context.optionsItemSelected: Publisher<Int>
-    get() = (this as? ReaktiveActivity)?.optionsItemSelected ?: Publishers.empty()
+    private fun onDestroy(context: ObservableActivity) {
+        context.onDestroyListeners -= this::onDestroy
+        context.onOptionsItemSelectedListener = null
+    }
+}

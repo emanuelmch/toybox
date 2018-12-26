@@ -25,7 +25,6 @@ package bill.catbox.home
 import bill.catbox.game.GameEngine
 import bill.catbox.game.GameNode
 import bill.catbox.game.GameState
-import bill.catbox.navigation.Navigator
 import bill.catbox.settings.SettingsRepository
 import bill.catbox.test.ReactiveTestRule
 import bill.reaktive.Publishers
@@ -50,10 +49,9 @@ class HomePresenterTests {
     fun before() {
         view = mockk(relaxed = true)
         game = mockk(relaxed = true)
-        val navigator: Navigator = mockk(relaxed = true)
         val settingsRepository: SettingsRepository = mockk(relaxed = true)
 
-        presenter = HomePresenter(view, game, navigator, settingsRepository)
+        presenter = HomePresenter(view, game, settingsRepository)
     }
 
     @Test

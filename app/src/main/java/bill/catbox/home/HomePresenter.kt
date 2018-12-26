@@ -28,19 +28,17 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import bill.catbox.game.GameEngine
 import bill.catbox.game.GameState
-import bill.catbox.navigation.Navigator
 import bill.catbox.settings.SettingsRepository
 import bill.reaktive.SubscriptionBag
 import timber.log.Timber
 
 class HomePresenter(private val view: HomeView,
                     private val game: GameEngine,
-                    private val navigator: Navigator,
                     private val settings: SettingsRepository
 ) : LifecycleObserver {
 
     constructor(context: Context, view: HomeView)
-            : this(view, GameEngine(), Navigator(context), SettingsRepository(context))
+            : this(view, GameEngine(), SettingsRepository(context))
 
     private val subscriptions = SubscriptionBag()
 
@@ -76,9 +74,6 @@ class HomePresenter(private val view: HomeView,
                         view.onEmptyBox(gameState.moveCount)
                     }
                 }
-
-        subscriptions += view.menuSelectedEvent
-                .subscribe(navigator::navigateFromMenu)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)

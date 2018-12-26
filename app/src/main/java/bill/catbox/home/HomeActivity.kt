@@ -25,14 +25,17 @@ package bill.catbox.home
 import android.os.Bundle
 import android.view.Menu
 import bill.catbox.R
-import bill.catbox.infra.ReaktiveActivity
+import bill.catbox.appbar.AppBarPresenter
+import bill.catbox.infra.ObservableActivity
 import kotlinx.android.synthetic.main.home_view.*
 
-class HomeActivity : ReaktiveActivity() {
+class HomeActivity : ObservableActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_view)
+
+        AppBarPresenter().observe(this)
 
         val homeView = HomeView(homeRoot)
         lifecycle.addObserver(HomePresenter(this, homeView))
@@ -40,6 +43,6 @@ class HomeActivity : ReaktiveActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main, menu)
-        return true
+        return super.onCreateOptionsMenu(menu)
     }
 }

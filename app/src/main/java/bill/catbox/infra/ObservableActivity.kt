@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,19 +20,25 @@
  * SOFTWARE.
  */
 
-package bill.catbox.navigation
+package bill.catbox.infra
 
-import android.content.Context
-import bill.catbox.R
-import bill.catbox.settings.SettingsActivity
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 
-open class Navigator(private val context: Context) {
+abstract class ObservableActivity : AppCompatActivity() {
+    var onOptionsItemSelectedListener: ((ObservableActivity, MenuItem) -> Boolean)? = null
+    var onDestroyListeners = listOf<(ObservableActivity) -> Unit>()
 
-    fun navigateFromMenu(menuId: Int) {
-        if (menuId == R.id.actionSettings) {
-            SettingsActivity.startActivity(context)
-        } else {
-            throw IllegalArgumentException("Illegal menuId requested: $menuId")
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item != null) {
+            onOptionsItemSelectedListener?.invoke(this, item)
         }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        onDestroyListeners.forEach { it.invoke(this) }
+        super.onDestroy()
     }
 }

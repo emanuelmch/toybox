@@ -25,7 +25,6 @@ package bill.catbox.home
 import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import bill.catbox.infra.ReaktiveActivity
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -38,12 +37,10 @@ import org.junit.Test
 class HomeViewTests {
 
     @Test
-    @Ignore("Couldn't get RecyclerView.Adapter to play nice :/")
+    @Ignore("Couldn't get RecyclerView.Adapter to play nice :/ ")
     fun `should attach an Adapter with the correct box count to the RecyclerView`() {
         val boxes: RecyclerView = mockk()
-        // Workaround for known bug in Kotlin 1.3:
-        // https://kotlinlang.org/docs/reference/compatibility-guide-13.html#passing-single-element-to-vararg-in-named-form
-        val context: Context = mockk(null, true, ReaktiveActivity::class)
+        val context: Context = mockk()
         val rootView: ViewGroup = mockk(relaxed = true)
 
         lateinit var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>
