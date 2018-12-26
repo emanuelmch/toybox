@@ -20,29 +20,32 @@
  * SOFTWARE.
  */
 
-package bill.catbox.home
+package bill.catbox.appbar
 
-import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import bill.catbox.R
-import bill.catbox.appbar.AppBarPresenter
 import bill.catbox.infra.ObservableActivity
-import kotlinx.android.synthetic.main.home_view.*
+import bill.catbox.settings.SettingsActivity
 
-class HomeActivity : ObservableActivity() {
+class AppBarPresenter {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.home_view)
-
-        AppBarPresenter().observe(this)
-
-        val homeView = HomeView(homeRoot)
-        lifecycle.addObserver(HomePresenter(this, homeView))
+    fun observe(activity: ObservableActivity) {
+        activity.onOptionsItemSelectedListener = this::onOptionsItemSelected
+        activity.onDestroyListeners += this::onDestroy
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
-        return super.onCreateOptionsMenu(menu)
+    private fun onOptionsItemSelected(context: ObservableActivity, item: MenuItem?): Boolean {
+        if (item?.itemId == R.id.actionSettings) {
+            SettingsActivity.startActivity(context)
+            return true
+        }
+
+        return false
+    }
+
+    private fun onDestroy(context: ObservableActivity) {
+        context.onDestroyListeners -= this::onDestroy
+        context.onOptionsItemSelectedListener = null
     }
 }

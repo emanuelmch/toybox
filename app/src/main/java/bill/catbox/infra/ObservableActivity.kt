@@ -20,19 +20,29 @@
  * SOFTWARE.
  */
 
-package bill.catbox.navigation
+package bill.catbox.infra
 
-import android.content.Context
-import bill.catbox.R
-import bill.catbox.settings.SettingsActivity
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import kotlin.reflect.KFunction1
+import kotlin.reflect.KFunction2
 
-open class Navigator(private val context: Context) {
+abstract class ObservableActivity : AppCompatActivity() {
+    var onOptionsItemSelectedListener: KFunction2<ObservableActivity, MenuItem, Boolean>? = null
+    var onDestroyListeners = listOf<KFunction1<ObservableActivity, Unit>>()
 
-    fun navigateFromMenu(menuId: Int) {
-        if (menuId == R.id.actionSettings) {
-            SettingsActivity.startActivity(context)
-        } else {
-            throw IllegalArgumentException("Illegal menuId requested: $menuId")
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        onOptionsItemSelectedListener?.let {
+            if (item != null) {
+                return it.invoke(this, item)
+            }
         }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        onDestroyListeners.forEach { it.invoke(this) }
+        super.onDestroy()
     }
 }

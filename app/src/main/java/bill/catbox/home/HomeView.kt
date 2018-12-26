@@ -36,14 +36,8 @@ import kotlin.properties.Delegates.observable
 class HomeView(private val rootView: ViewGroup) {
 
     private val context = rootView.context
-    private val boxAdapter = BoxAdapter()
+    private val boxAdapter = BoxAdapter().apply { rootView.boxes.adapter = this }
 
-    init {
-        assert(context is ReaktiveActivity) { "HomeView needs a ReaktiveActivity for menuSelectedEvent" }
-        rootView.boxes.adapter = boxAdapter
-    }
-
-    val menuSelectedEvent = context.optionsItemSelected
     val boxChosenEvent = boxAdapter.boxClickedEvent
 
     fun startGame(boxCount: Int) {
