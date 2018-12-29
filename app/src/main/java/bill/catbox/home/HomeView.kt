@@ -26,7 +26,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import bill.catbox.R
-import bill.catbox.infra.*
+import bill.catbox.infra.inflateChild
+import bill.catbox.infra.snackbar
+import bill.catbox.infra.toOrdinal
 import bill.reaktive.Publishers
 import kotlinx.android.synthetic.main.home_item.view.*
 import kotlinx.android.synthetic.main.home_view.view.*
@@ -36,8 +38,7 @@ import kotlin.properties.Delegates.observable
 class HomeView(private val rootView: ViewGroup) {
 
     private val context = rootView.context
-    private val boxAdapter: BoxAdapter
-            get() = rootView.boxes.adapter as? BoxAdapter ?: BoxAdapter().also { rootView.boxes.adapter = it }
+    private val boxAdapter: BoxAdapter by lazy { BoxAdapter().also { rootView.boxes.adapter = it } }
 
     val boxChosenEvent = boxAdapter.boxClickedEvent
 
@@ -55,7 +56,7 @@ class HomeView(private val rootView: ViewGroup) {
     }
 }
 
-class BoxAdapter : RecyclerView.Adapter<BoxViewHolder>() {
+private class BoxAdapter : RecyclerView.Adapter<BoxViewHolder>() {
 
     val boxClickedEvent = Publishers.open<Int>()
 
@@ -72,7 +73,7 @@ class BoxAdapter : RecyclerView.Adapter<BoxViewHolder>() {
             holder.bind(position)
 }
 
-class BoxViewHolder(itemView: View,
+private class BoxViewHolder(itemView: View,
                             private val boxChosenEvent: (Int) -> Unit) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(position: Int) {
