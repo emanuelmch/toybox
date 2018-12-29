@@ -24,10 +24,9 @@ package bill.catbox.home
 
 import android.content.Context
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.MockRecyclerView
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
 import kotlinx.android.synthetic.main.home_view.view.*
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
@@ -38,37 +37,17 @@ class HomeViewTests {
 
     @Test
     fun `should attach an Adapter with the correct box count to the RecyclerView`() {
-        val boxes: RecyclerView = mockk()
+        val boxes = MockRecyclerView.create()
         val context: Context = mockk()
         val rootView: ViewGroup = mockk(relaxed = true)
-
-        var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
-
-        every { boxes.adapter } answers { adapter }
 
         every { rootView.context } returns context
         every { rootView.boxes } returns boxes
 
-        every {
-            boxes.adapter = any()
-        } propertyType RecyclerView.Adapter::class answers {
-            val spy = spyk(value as BoxAdapter)
-
-            var boxCount = 0
-            every { spy.boxCount } answers { boxCount }
-            every {
-                spy.boxCount = any()
-            } propertyType Int::class answers {
-                boxCount = value
-            }
-
-            adapter = spy
-        }
-
         val view = HomeView(rootView)
         view.startGame(3)
 
-        assertThat(adapter, `is`(notNullValue()))
-        assertThat(adapter!!.itemCount, `is`(3))
+        assertThat(boxes.adapter, `is`(notNullValue()))
+        assertThat(boxes.adapter!!.itemCount, `is`(3))
     }
 }
