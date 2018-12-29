@@ -36,7 +36,8 @@ import kotlin.properties.Delegates.observable
 class HomeView(private val rootView: ViewGroup) {
 
     private val context = rootView.context
-    private val boxAdapter = BoxAdapter().apply { rootView.boxes.adapter = this }
+    private val boxAdapter: BoxAdapter
+            get() = rootView.boxes.adapter as? BoxAdapter ?: BoxAdapter().apply { rootView.boxes.adapter = this }
 
     val boxChosenEvent = boxAdapter.boxClickedEvent
 
@@ -54,7 +55,7 @@ class HomeView(private val rootView: ViewGroup) {
     }
 }
 
-private class BoxAdapter : RecyclerView.Adapter<BoxViewHolder>() {
+class BoxAdapter : RecyclerView.Adapter<BoxViewHolder>() {
 
     val boxClickedEvent = Publishers.open<Int>()
 
@@ -71,7 +72,7 @@ private class BoxAdapter : RecyclerView.Adapter<BoxViewHolder>() {
             holder.bind(position)
 }
 
-private class BoxViewHolder(itemView: View,
+class BoxViewHolder(itemView: View,
                             private val boxChosenEvent: (Int) -> Unit) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(position: Int) {

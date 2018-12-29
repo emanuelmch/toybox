@@ -27,42 +27,48 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.spyk
 import kotlinx.android.synthetic.main.home_view.view.*
 import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.Ignore
 import org.junit.Test
 
 class HomeViewTests {
 
     @Test
-    @Ignore("Couldn't get RecyclerView.Adapter to play nice :/ ")
     fun `should attach an Adapter with the correct box count to the RecyclerView`() {
         val boxes: RecyclerView = mockk()
         val context: Context = mockk()
         val rootView: ViewGroup = mockk(relaxed = true)
 
-        lateinit var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>
+        var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
+
+        every { boxes.adapter } answers { adapter }
 
         every { rootView.context } returns context
         every { rootView.boxes } returns boxes
+
         every {
             boxes.adapter = any()
         } propertyType RecyclerView.Adapter::class answers {
-            adapter = value
-//            value.registerAdapterDataObserver(mockk())
+            val spy = spyk(value as BoxAdapter)
+
+            var boxCount = 0
+            every { spy.boxCount } answers { boxCount }
+            every {
+                spy.boxCount = any()
+            } propertyType Int::class answers {
+                boxCount = value
+            }
+
+            adapter = spy
         }
 
         val view = HomeView(rootView)
         view.startGame(3)
 
-        assertThat(adapter.itemCount, `is`(3))
-
-        verify {
-            // boxes.adapter = adapter
-            // boxes.internalAdapterObserver.notifyChanged()
-            // boxes.adapter.itemCount = 3
-        }
+        assertThat(adapter, `is`(notNullValue()))
+        assertThat(adapter!!.itemCount, `is`(3))
     }
 }
