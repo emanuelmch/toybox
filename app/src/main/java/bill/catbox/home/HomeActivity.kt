@@ -26,6 +26,8 @@ import android.os.Bundle
 import android.view.Menu
 import bill.catbox.R
 import bill.catbox.appbar.AppBarPresenter
+import bill.catbox.home.boxes.BoxesPresenter
+import bill.catbox.home.boxes.BoxesView
 import bill.catbox.infra.ObservableActivity
 import kotlinx.android.synthetic.main.home_view.*
 
@@ -37,8 +39,8 @@ class HomeActivity : ObservableActivity() {
 
         AppBarPresenter().observe(this)
 
-        val homeView = HomeView(homeRoot)
-        lifecycle.addObserver(HomePresenter(this, homeView))
+        val boxesView = BoxesView(this.boxes)
+        lifecycle.addObserver(BoxesPresenter(this, boxesView))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

@@ -20,31 +20,21 @@
  * SOFTWARE.
  */
 
-package bill.catbox.home
+package bill.catbox.home.boxes
 
-import android.content.Context
-import android.view.ViewGroup
 import androidx.recyclerview.widget.MockRecyclerView
-import io.mockk.every
-import io.mockk.mockk
-import kotlinx.android.synthetic.main.home_view.view.*
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
-class HomeViewTests {
+class BoxesViewTests {
 
     @Test
     fun `should attach an Adapter with the correct box count to the RecyclerView`() {
         val boxes = MockRecyclerView.create()
-        val context: Context = mockk()
-        val rootView: ViewGroup = mockk(relaxed = true)
 
-        every { rootView.context } returns context
-        every { rootView.boxes } returns boxes
-
-        val view = HomeView(rootView)
+        val view = BoxesView(boxes)
         view.startGame(3)
 
         assertThat(boxes.adapter, `is`(notNullValue()))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package bill.catbox.home
+package bill.catbox.home.boxes
 
 import android.content.Context
 import androidx.lifecycle.Lifecycle
@@ -32,12 +32,12 @@ import bill.catbox.settings.SettingsRepository
 import bill.reaktive.SubscriptionBag
 import timber.log.Timber
 
-class HomePresenter(private val view: HomeView,
-                    private val game: GameEngine,
-                    private val settings: SettingsRepository
+class BoxesPresenter(private val view: BoxesView,
+                     private val game: GameEngine,
+                     private val settings: SettingsRepository
 ) : LifecycleObserver {
 
-    constructor(context: Context, view: HomeView)
+    constructor(context: Context, view: BoxesView)
             : this(view, GameEngine(), SettingsRepository(context))
 
     private val subscriptions = SubscriptionBag()
