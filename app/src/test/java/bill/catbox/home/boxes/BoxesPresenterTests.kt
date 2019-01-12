@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package bill.catbox.home
+package bill.catbox.home.boxes
 
 import bill.catbox.game.GameEngine
 import bill.catbox.game.GameNode
@@ -35,15 +35,15 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class HomePresenterTests {
+class BoxesPresenterTests {
 
     @get:Rule
     val reactiveTestRule = ReactiveTestRule()
 
-    private lateinit var view: HomeView
+    private lateinit var view: BoxesView
     private lateinit var game: GameEngine
 
-    private lateinit var presenter: HomePresenter
+    private lateinit var presenter: BoxesPresenter
 
     @Before
     fun before() {
@@ -51,7 +51,7 @@ class HomePresenterTests {
         game = mockk(relaxed = true)
         val settingsRepository: SettingsRepository = mockk(relaxed = true)
 
-        presenter = HomePresenter(view, game, settingsRepository)
+        presenter = BoxesPresenter(view, game, settingsRepository)
     }
 
     @Test

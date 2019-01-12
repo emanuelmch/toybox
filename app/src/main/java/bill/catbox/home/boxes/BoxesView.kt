@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package bill.catbox.home
+package bill.catbox.home.boxes
 
 import android.view.View
 import android.view.ViewGroup
@@ -29,18 +29,18 @@ import bill.catbox.R
 import bill.catbox.infra.inflateChild
 import bill.catbox.infra.snackbar
 import bill.catbox.infra.toOrdinal
+import bill.reaktive.Publisher
 import bill.reaktive.Publishers
-import kotlinx.android.synthetic.main.home_item.view.*
-import kotlinx.android.synthetic.main.home_view.view.*
+import kotlinx.android.synthetic.main.boxes_item.view.*
 import timber.log.Timber
 import kotlin.properties.Delegates.observable
 
-class HomeView(private val rootView: ViewGroup) {
+class BoxesView(private val boxes: RecyclerView) {
 
-    private val context = rootView.context
-    private val boxAdapter: BoxAdapter by lazy { BoxAdapter().apply { rootView.boxes.adapter = this } }
+    private val context = boxes.context
+    private val boxAdapter: BoxAdapter by lazy { BoxAdapter().apply { boxes.adapter = this } }
 
-    val boxChosenEvent = boxAdapter.boxClickedEvent
+    val boxChosenEvent: Publisher<Int> = boxAdapter.boxClickedEvent
 
     fun startGame(boxCount: Int) {
         Timber.d("Starting the game with $boxCount boxes")
@@ -48,11 +48,11 @@ class HomeView(private val rootView: ViewGroup) {
     }
 
     fun onEmptyBox(attempts: Int) {
-        rootView.snackbar(context.getString(R.string.empty_box, attempts.toOrdinal()))
+        boxes.snackbar(context.getString(R.string.empty_box, attempts.toOrdinal()))
     }
 
     fun onCatFound(attempts: Int) {
-        rootView.snackbar(context.resources.getQuantityString(R.plurals.cat_found, attempts, attempts))
+        boxes.snackbar(context.resources.getQuantityString(R.plurals.cat_found, attempts, attempts))
     }
 }
 
@@ -67,7 +67,7 @@ private class BoxAdapter : RecyclerView.Adapter<BoxViewHolder>() {
     override fun getItemCount() = boxCount
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-            BoxViewHolder(parent.inflateChild(R.layout.home_item), boxClickedEvent::onNext)
+            BoxViewHolder(parent.inflateChild(R.layout.boxes_item), boxClickedEvent::onNext)
 
     override fun onBindViewHolder(holder: BoxViewHolder, position: Int) =
             holder.bind(position)
