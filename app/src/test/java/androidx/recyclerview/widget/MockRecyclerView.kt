@@ -1,9 +1,8 @@
 package androidx.recyclerview.widget
 
+import bill.catbox.test.forceSet
 import io.mockk.every
 import io.mockk.mockk
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 
 class MockRecyclerView {
 
@@ -13,26 +12,16 @@ class MockRecyclerView {
 
     companion object {
         fun create(): RecyclerView {
-            val view: RecyclerView = mockk()
+            val view: RecyclerView = mockk(relaxed = true)
             var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
 
             every { view.adapter } answers { adapter }
+
             every {
                 view.adapter = any()
             } propertyType RecyclerView.Adapter::class answers {
-                val field = RecyclerView.Adapter::class.java.getDeclaredField("mObservable")
-                field.isAccessible = true
-
-                val modifiers = Field::class.java.getDeclaredField("modifiers")
-                modifiers.isAccessible = true
-                modifiers.setInt(field, field.modifiers and Modifier.FINAL.inv())
-
-                field.set(value, MockAdapterDataObservable())
+                value.forceSet("mObservable", MockAdapterDataObservable())
                 adapter = value
-
-                modifiers.setInt(field, field.modifiers or Modifier.FINAL)
-                modifiers.isAccessible = false
-                field.isAccessible = false
             }
 
             return view
