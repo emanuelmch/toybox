@@ -22,11 +22,18 @@
 
 package bill.catbox.game
 
+import bill.reaktive.Publisher
+import bill.reaktive.Publishers
 import timber.log.Timber
 
 open class GameEngine {
 
-    open fun newGame(boxCount: Int) = GameState(boxCount)
+    private val gameStateChangedPublisher = Publishers.open<GameState>()
+
+    val gameStateChanged: Publisher<GameState>
+        get() = gameStateChangedPublisher.startWith(GameState(0))
+
+    open fun newGame(boxCount: Int) = GameState(boxCount).also(gameStateChangedPublisher::onNext)
 
     open fun play(state: GameState, boxChecked: Int): GameState {
         Timber.d("Player checked box $boxChecked:")
@@ -56,18 +63,23 @@ open class GameEngine {
         Timber.d("${catFoundNodes.size} new cat found nodes:")
         catFoundNodes.forEach { Timber.d("$it") }
 
-        return if (emptyBoxNodes.isNotEmpty()) {
+        val newState = if (emptyBoxNodes.isNotEmpty()) {
             state.copy(gameNodes = emptyBoxNodes)
         } else {
             state.copy(gameNodes = catFoundNodes)
         }
+
+        gameStateChangedPublisher.onNext(newState)
+        return newState
     }
 }
 
 data class GameState(val boxCount: Int,
                      val gameNodes: Collection<GameNode> = (0 until boxCount).map { GameNode(it) }) {
     val isCatFound = gameNodes.any { it.isCatFound }
-    val moveCount = gameNodes.firstOrNull()?.moves?.size ?: 0
+    val attempts = gameNodes.firstOrNull()?.moves?.size ?: 0
+
+    override fun toString() = if (gameNodes.isEmpty()) "[]" else gameNodes.first().toString()
 }
 
 data class GameNode(val locationHistory: List<Int>,

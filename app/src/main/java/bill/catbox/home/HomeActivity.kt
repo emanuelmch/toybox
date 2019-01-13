@@ -26,8 +26,11 @@ import android.os.Bundle
 import android.view.Menu
 import bill.catbox.R
 import bill.catbox.appbar.AppBarPresenter
+import bill.catbox.game.GameEngine
 import bill.catbox.home.boxes.BoxesPresenter
 import bill.catbox.home.boxes.BoxesView
+import bill.catbox.home.counter.AttemptCounterPresenter
+import bill.catbox.home.counter.AttemptCounterView
 import bill.catbox.infra.ObservableActivity
 import kotlinx.android.synthetic.main.home_view.*
 
@@ -39,8 +42,15 @@ class HomeActivity : ObservableActivity() {
 
         AppBarPresenter().observe(this)
 
+        val game = GameEngine()
+
         val boxesView = BoxesView(this.boxes)
-        lifecycle.addObserver(BoxesPresenter(this, boxesView))
+        lifecycle.addObserver(BoxesPresenter(this, boxesView, game))
+
+        val counterView = AttemptCounterView(this.attemptCounter)
+        lifecycle.addObserver(
+                AttemptCounterPresenter(counterView, game)
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

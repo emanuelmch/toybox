@@ -20,65 +20,28 @@
  * SOFTWARE.
  */
 
-package bill.catbox.home.boxes
+package bill.catbox.home.counter
 
-import android.content.Context
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import bill.catbox.game.GameEngine
-import bill.catbox.game.GameState
-import bill.catbox.settings.SettingsRepository
 import bill.reaktive.SubscriptionBag
-import timber.log.Timber
 
-class BoxesPresenter(private val view: BoxesView,
-                     private val game: GameEngine,
-                     private val settings: SettingsRepository
-) : LifecycleObserver {
-
-    constructor(context: Context, view: BoxesView, game: GameEngine)
-            : this(view, game, SettingsRepository(context))
+class AttemptCounterPresenter(private val view: AttemptCounterView,
+                              private val game: GameEngine) : LifecycleObserver {
 
     private val subscriptions = SubscriptionBag()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun attach() {
-        Timber.d("Presenter::attach")
-
-        // TODO: Remove this variable using a reduce Observable
-        var gameState = GameState(0)
-
-        subscriptions += settings.watchBoxCount()
-                .subscribe {
-                    gameState = game.newGame(it)
-                    view.startGame(it)
-                }
-
-        subscriptions += view.boxChosenEvent
-                .signalOnBackground()
-                .doOnNext {
-                    Timber.d("Box #$it chosen")
-                    gameState = game.play(gameState, it)
-                }
-                .doOnNext {
-                    if (gameState.isCatFound) {
-                        Thread.sleep(2000)
-                    }
-                }
+        subscriptions += game.gameStateChanged
                 .signalOnForeground()
-                .subscribe {
-                    if (gameState.isCatFound) {
-                        view.onCatFound(gameState.attempts)
-                    } else {
-                        view.onEmptyBox(gameState.attempts)
-                    }
-                }
+                .subscribe { view.count = it.attempts }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun detach() {
-        Timber.d("Presenter::detach")
         subscriptions.clear()
     }
 }
