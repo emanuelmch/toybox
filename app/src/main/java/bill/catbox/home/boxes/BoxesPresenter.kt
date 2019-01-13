@@ -37,8 +37,8 @@ class BoxesPresenter(private val view: BoxesView,
                      private val settings: SettingsRepository
 ) : LifecycleObserver {
 
-    constructor(context: Context, view: BoxesView)
-            : this(view, GameEngine(), SettingsRepository(context))
+    constructor(context: Context, view: BoxesView, game: GameEngine)
+            : this(view, game, SettingsRepository(context))
 
     private val subscriptions = SubscriptionBag()
 
@@ -69,9 +69,9 @@ class BoxesPresenter(private val view: BoxesView,
                 .signalOnForeground()
                 .subscribe {
                     if (gameState.isCatFound) {
-                        view.onCatFound(gameState.moveCount)
+                        view.onCatFound(gameState.attempts)
                     } else {
-                        view.onEmptyBox(gameState.moveCount)
+                        view.onEmptyBox(gameState.attempts)
                     }
                 }
     }

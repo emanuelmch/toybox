@@ -51,3 +51,5 @@ fun Int.toOrdinal(): String {
 
 fun ViewGroup.inflateChild(@LayoutRes resource: Int): View =
         LayoutInflater.from(context).inflate(resource, this, false)
+
+fun CharSequence.toInt(): Int = Integer.parseInt(this.toString())
