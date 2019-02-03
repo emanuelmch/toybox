@@ -20,28 +20,10 @@
  * SOFTWARE.
  */
 
-package bill.catbox.home.counter
+package bill.catbox.infra
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import bill.catbox.game.GameStateContainer
-import bill.reaktive.SubscriptionBag
+import bill.reaktive.Publisher
+import timber.log.Timber
 
-class AttemptCounterPresenter(private val view: AttemptCounterView,
-                              private val game: GameStateContainer = GameStateContainer) : LifecycleObserver {
-
-    private val subscriptions = SubscriptionBag()
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun attach() {
-        subscriptions += game.gameStateChanged
-                .signalOnForeground()
-                .subscribe { view.count = it.attempts }
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun detach() {
-        subscriptions.clear()
-    }
-}
+fun <T> Publisher<T>.debug(lazyMessage: (T) -> String) =
+        doOnNext { Timber.d(lazyMessage(it)) }

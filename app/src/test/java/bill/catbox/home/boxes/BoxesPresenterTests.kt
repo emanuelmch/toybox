@@ -22,9 +22,9 @@
 
 package bill.catbox.home.boxes
 
-import bill.catbox.game.GameEngine
 import bill.catbox.game.GameNode
 import bill.catbox.game.GameState
+import bill.catbox.game.GameStateContainer
 import bill.catbox.settings.SettingsRepository
 import bill.catbox.test.ReactiveTestRule
 import bill.reaktive.Publishers
@@ -41,7 +41,7 @@ class BoxesPresenterTests {
     val reactiveTestRule = ReactiveTestRule()
 
     private lateinit var view: BoxesView
-    private lateinit var game: GameEngine
+    private lateinit var game: GameStateContainer
 
     private lateinit var presenter: BoxesPresenter
 
@@ -64,16 +64,13 @@ class BoxesPresenterTests {
 
     @Test
     fun `should call view_onCatFound when cat is found`() {
-        //FIXME: Should be a TestOpenPublisher that's actually closed
-        val boxChosenEvents = Publishers.open<Int>()
-        every { view.boxChosenEvent } returns boxChosenEvents
+        every { view.boxChosenEvent } returns Publishers.elements(0)
 
         val catFoundGameNode = GameNode(listOf(0), listOf(0))
         val catFoundState = GameState(1, listOf(catFoundGameNode))
-        every { game.play(any(), any()) } returns catFoundState
+        every { game.play(any()) } returns catFoundState
 
         presenter.attach()
-        boxChosenEvents.onNext(0)
 
         verify {
             view.onCatFound(any())
