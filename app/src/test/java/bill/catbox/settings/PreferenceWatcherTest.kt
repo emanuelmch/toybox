@@ -23,32 +23,30 @@
 package bill.catbox.settings
 
 import android.content.SharedPreferences
+import io.mockk.spyk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.*
-import org.mockito.MockitoAnnotations
-import org.mockito.Spy
 
 class PreferenceWatcherTest {
 
-    @Spy
     private lateinit var sharedPrefs: MockSharedPreferences
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
+        sharedPrefs = spyk(MockSharedPreferences())
     }
 
     @Test
     fun testWatchInt_SharedPrefRegistering() {
         val disposable = PreferenceWatcher(sharedPrefs).watchInt("", 1984).subscribe()
 
-        verify(sharedPrefs).registerOnSharedPreferenceChangeListener(any())
-        verify(sharedPrefs, never()).unregisterOnSharedPreferenceChangeListener(any())
+        verify { sharedPrefs.registerOnSharedPreferenceChangeListener(any()) }
+        verify(exactly = 0) { sharedPrefs.unregisterOnSharedPreferenceChangeListener(any()) }
 
         disposable.cancel()
 
-        verify(sharedPrefs).unregisterOnSharedPreferenceChangeListener(any())
+        verify { sharedPrefs.unregisterOnSharedPreferenceChangeListener(any()) }
     }
 
     @Test
