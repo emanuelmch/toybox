@@ -26,7 +26,6 @@ import android.os.Bundle
 import android.view.Menu
 import bill.catbox.R
 import bill.catbox.appbar.AppBarPresenter
-import bill.catbox.game.GameEngine
 import bill.catbox.home.boxes.BoxesPresenter
 import bill.catbox.home.boxes.BoxesView
 import bill.catbox.home.counter.AttemptCounterPresenter
@@ -42,15 +41,11 @@ class HomeActivity : ObservableActivity() {
 
         AppBarPresenter().observe(this)
 
-        val game = GameEngine()
-
         val boxesView = BoxesView(this.boxes)
-        lifecycle.addObserver(BoxesPresenter(this, boxesView, game))
+        lifecycle.addObserver(BoxesPresenter(this, boxesView))
 
         val counterView = AttemptCounterView(this.attemptCounter)
-        lifecycle.addObserver(
-                AttemptCounterPresenter(counterView, game)
-        )
+        lifecycle.addObserver(AttemptCounterPresenter(counterView))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

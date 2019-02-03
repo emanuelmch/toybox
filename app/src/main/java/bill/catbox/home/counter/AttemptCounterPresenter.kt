@@ -3,11 +3,11 @@ package bill.catbox.home.counter
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import bill.catbox.game.GameEngine
+import bill.catbox.game.GameStateContainer
 import bill.reaktive.SubscriptionBag
 
 class AttemptCounterPresenter(private val view: AttemptCounterView,
-                              private val game: GameEngine) : LifecycleObserver {
+                              private val game: GameStateContainer = GameStateContainer) : LifecycleObserver {
 
     private val subscriptions = SubscriptionBag()
 

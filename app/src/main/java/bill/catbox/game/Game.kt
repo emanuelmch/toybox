@@ -25,15 +25,26 @@ package bill.catbox.game
 import bill.reaktive.Publisher
 import bill.reaktive.Publishers
 import timber.log.Timber
+import kotlin.properties.Delegates.observable
+
+object GameStateContainer {
+
+    private val gameEngine = GameEngine()
+    private val gameStateChangedPublisher = Publishers.open<GameState>()
+    private var state: GameState by observable(GameState(0)) { _, _, value ->
+        gameStateChangedPublisher.onNext(value)
+    }
+
+    val gameStateChanged: Publisher<GameState>
+        get() = gameStateChangedPublisher.startWith(state)
+
+    fun newGame(boxCount: Int) = gameEngine.newGame(boxCount).let { state = it }
+    fun play(boxChecked: Int) = gameEngine.play(state, boxChecked).also { state = it }
+}
 
 open class GameEngine {
 
-    private val gameStateChangedPublisher = Publishers.open<GameState>()
-
-    val gameStateChanged: Publisher<GameState>
-        get() = gameStateChangedPublisher.startWith(GameState(0))
-
-    open fun newGame(boxCount: Int) = GameState(boxCount).also(gameStateChangedPublisher::onNext)
+    open fun newGame(boxCount: Int) = GameState(boxCount)
 
     open fun play(state: GameState, boxChecked: Int): GameState {
         Timber.d("Player checked box $boxChecked:")
@@ -69,15 +80,16 @@ open class GameEngine {
             state.copy(gameNodes = catFoundNodes)
         }
 
-        gameStateChangedPublisher.onNext(newState)
         return newState
     }
 }
 
 data class GameState(val boxCount: Int,
                      val gameNodes: Collection<GameNode> = (0 until boxCount).map { GameNode(it) }) {
-    val isCatFound = gameNodes.any { it.isCatFound }
-    val attempts = gameNodes.firstOrNull()?.moves?.size ?: 0
+
+    val attempts by lazy { gameNodes.firstOrNull()?.moves?.size ?: 0 }
+    val isCatFound by lazy { gameNodes.any { it.isCatFound } }
+    val isNewGame by lazy { attempts == 0 }
 
     override fun toString() = if (gameNodes.isEmpty()) "[]" else gameNodes.first().toString()
 }

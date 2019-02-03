@@ -28,16 +28,17 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import bill.catbox.game.GameEngine
 import bill.catbox.game.GameState
+import bill.catbox.game.GameStateContainer
 import bill.catbox.settings.SettingsRepository
 import bill.reaktive.SubscriptionBag
 import timber.log.Timber
 
 class BoxesPresenter(private val view: BoxesView,
-                     private val game: GameEngine,
+                     private val game: GameStateContainer,
                      private val settings: SettingsRepository
 ) : LifecycleObserver {
 
-    constructor(context: Context, view: BoxesView, game: GameEngine)
+    constructor(context: Context, view: BoxesView, game: GameStateContainer = GameStateContainer)
             : this(view, game, SettingsRepository(context))
 
     private val subscriptions = SubscriptionBag()
@@ -46,32 +47,31 @@ class BoxesPresenter(private val view: BoxesView,
     fun attach() {
         Timber.d("Presenter::attach")
 
-        // TODO: Remove this variable using a reduce Observable
-        var gameState = GameState(0)
-
         subscriptions += settings.watchBoxCount()
-                .subscribe {
-                    gameState = game.newGame(it)
-                    view.startGame(it)
-                }
+                .subscribe { game.newGame(it) }
+
+        subscriptions += game.gameStateChanged
+                .filter(GameState::isNewGame)
+                .signalOnForeground()
+                .subscribe { view.startGame(it.boxCount) }
 
         subscriptions += view.boxChosenEvent
                 .signalOnBackground()
-                .doOnNext {
+                .map {
                     Timber.d("Box #$it chosen")
-                    gameState = game.play(gameState, it)
+                    game.play(it)
                 }
                 .doOnNext {
-                    if (gameState.isCatFound) {
+                    if (it.isCatFound) {
                         Thread.sleep(2000)
                     }
                 }
                 .signalOnForeground()
-                .subscribe {
-                    if (gameState.isCatFound) {
-                        view.onCatFound(gameState.attempts)
+                .subscribe { game ->
+                    if (game.isCatFound) {
+                        view.onCatFound(game.attempts)
                     } else {
-                        view.onEmptyBox(gameState.attempts)
+                        view.onEmptyBox(game.attempts)
                     }
                 }
     }
