@@ -91,7 +91,7 @@ class PreferenceWatcherTest {
     }
 }
 
-private open class MockSharedPreferences : SharedPreferences {
+private class MockSharedPreferences : SharedPreferences {
     private val intValues = mutableMapOf<String, Int>()
     private val listeners = mutableListOf<SharedPreferences.OnSharedPreferenceChangeListener>()
 

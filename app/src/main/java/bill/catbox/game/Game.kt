@@ -42,11 +42,11 @@ object GameStateContainer {
     fun play(boxChecked: Int) = gameEngine.play(state, boxChecked).also { state = it }
 }
 
-open class GameEngine {
+class GameEngine {
 
-    open fun newGame(boxCount: Int) = GameState(boxCount)
+    fun newGame(boxCount: Int) = GameState(boxCount)
 
-    open fun play(state: GameState, boxChecked: Int): GameState {
+    fun play(state: GameState, boxChecked: Int): GameState {
         Timber.d("Player checked box $boxChecked:")
         val catFoundNodes = mutableSetOf<GameNode>()
         val emptyBoxNodes = mutableSetOf<GameNode>()

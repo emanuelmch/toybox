@@ -15,7 +15,8 @@ class AttemptCounterPresenter(private val view: AttemptCounterView,
     fun attach() {
         subscriptions += game.gameStateChanged
                 .signalOnForeground()
-                .subscribe { view.count = it.attempts }
+                .doOnNext { view.count = it.attempts }
+                .subscribe()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)

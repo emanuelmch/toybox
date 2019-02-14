@@ -30,11 +30,11 @@ import bill.reaktive.Publishers
 
 private const val boxCountPreference = "pref_boxCount"
 
-open class SettingsRepository(context: Context) {
+class SettingsRepository(context: Context) {
 
     private val watcher = PreferenceWatcher(context)
 
-    open fun watchBoxCount() = watcher.watchInt(boxCountPreference)
+    fun watchBoxCount() = watcher.watchInt(boxCountPreference)
 }
 
 class PreferenceWatcher(private val sharedPrefs: SharedPreferences) {
