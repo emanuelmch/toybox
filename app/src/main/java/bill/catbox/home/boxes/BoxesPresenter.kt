@@ -58,10 +58,8 @@ class BoxesPresenter(private val view: BoxesView,
 
         subscriptions += view.boxChosenEvent
                 .signalOnBackground()
-                .map {
-                    Timber.d("Box #$it chosen")
-                    game.play(it)
-                }
+                .doOnNext { Timber.d("Box #$it chosen") }
+                .map(game::play)
                 .doOnNext {
                     if (it.isCatFound) {
                         Thread.sleep(2000)

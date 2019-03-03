@@ -44,7 +44,7 @@ class PreferenceWatcherTest {
         verify { sharedPrefs.registerOnSharedPreferenceChangeListener(any()) }
         verify(exactly = 0) { sharedPrefs.unregisterOnSharedPreferenceChangeListener(any()) }
 
-        disposable.cancel()
+        disposable.onCancel()
 
         verify { sharedPrefs.unregisterOnSharedPreferenceChangeListener(any()) }
     }
@@ -56,7 +56,7 @@ class PreferenceWatcherTest {
                 .test()
 
         subscriber.assertValuesOnly(1984)
-        subscriber.cancel()
+        subscriber.onCancel()
         subscriber.assertNoErrors()
     }
 
@@ -67,7 +67,7 @@ class PreferenceWatcherTest {
         sharedPrefs.setInt("key", 124)
 
         subscriber.assertValuesOnly(123, 124)
-        subscriber.cancel()
+        subscriber.onCancel()
         subscriber.assertNoErrors()
     }
 
@@ -80,13 +80,13 @@ class PreferenceWatcherTest {
         sharedPrefs.setInt("key", 125)
 
         subscriber1.assertValuesOnly(123, 124, 125)
-        subscriber1.cancel()
+        subscriber1.onCancel()
         subscriber1.assertNoErrors()
 
         sharedPrefs.setInt("key", 126)
 
         subscriber2.assertValuesOnly(124, 125, 126)
-        subscriber2.cancel()
+        subscriber2.onCancel()
         subscriber2.assertNoErrors()
     }
 }
