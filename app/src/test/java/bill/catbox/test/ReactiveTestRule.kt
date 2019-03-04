@@ -29,7 +29,7 @@ import org.junit.runners.model.Statement
 
 class ReactiveTestRule : TestRule {
 
-    override fun apply(base: Statement, description: Description?) = object: Statement() {
+    override fun apply(base: Statement, description: Description?) = object : Statement() {
         override fun evaluate() {
             TestMode.isEnabled = true
 

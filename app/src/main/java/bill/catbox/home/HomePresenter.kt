@@ -40,7 +40,7 @@ class HomePresenter(private val view: HomeView,
                     private val game: GameEngine,
                     private val navigator: Navigator,
                     private val settings: SettingsRepository
-): LifecycleObserver {
+) : LifecycleObserver {
 
     constructor(view: HomeView, context: Context)
             : this(view, GameEngine(), Navigator(context), SettingsRepository(context))
