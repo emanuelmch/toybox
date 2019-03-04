@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,20 +22,12 @@
 
 package bill.catbox.test
 
-import bill.reaktive.TestMode
-import org.junit.rules.TestRule
-import org.junit.runner.Description
-import org.junit.runners.model.Statement
+fun <T> deferring(function: ((() -> Unit) -> Unit) -> T): T {
+    val actions = mutableListOf<() -> Unit>()
 
-class ReactiveTestRule : TestRule {
-
-    override fun apply(base: Statement, description: Description?) = object : Statement() {
-        override fun evaluate() {
-            TestMode.isEnabled = true
-
-            base.evaluate()
-
-            TestMode.isEnabled = false
-        }
+    try {
+        return function(actions::plusAssign)
+    } finally {
+        actions.reversed().forEach(Function0<Unit>::invoke)
     }
 }

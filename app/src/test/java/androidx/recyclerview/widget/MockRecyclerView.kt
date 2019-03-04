@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,33 @@
  * SOFTWARE.
  */
 
-package bill.catbox.test
+package androidx.recyclerview.widget
 
-import bill.reaktive.TestMode
-import org.junit.rules.TestRule
-import org.junit.runner.Description
-import org.junit.runners.model.Statement
+import bill.catbox.test.forceSet
+import io.mockk.every
+import io.mockk.mockk
 
-class ReactiveTestRule : TestRule {
+class MockRecyclerView {
 
-    override fun apply(base: Statement, description: Description?) = object : Statement() {
-        override fun evaluate() {
-            TestMode.isEnabled = true
+    private class MockAdapterDataObservable : RecyclerView.AdapterDataObservable() {
+        override fun notifyChanged() = Unit
+    }
 
-            base.evaluate()
+    companion object {
+        fun create(): RecyclerView {
+            val view: RecyclerView = mockk(relaxed = true)
+            var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
 
-            TestMode.isEnabled = false
+            every { view.adapter } answers { adapter }
+
+            every {
+                view.adapter = any()
+            } propertyType RecyclerView.Adapter::class answers {
+                value.forceSet("mObservable", MockAdapterDataObservable())
+                adapter = value
+            }
+
+            return view
         }
     }
 }

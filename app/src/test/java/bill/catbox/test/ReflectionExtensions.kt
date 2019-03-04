@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,20 +22,32 @@
 
 package bill.catbox.test
 
-import bill.reaktive.TestMode
-import org.junit.rules.TestRule
-import org.junit.runner.Description
-import org.junit.runners.model.Statement
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 
-class ReactiveTestRule : TestRule {
-
-    override fun apply(base: Statement, description: Description?) = object : Statement() {
-        override fun evaluate() {
-            TestMode.isEnabled = true
-
-            base.evaluate()
-
-            TestMode.isEnabled = false
+fun Any.forceSet(fieldName: String, value: Any) = deferring { defer ->
+    val field = javaClass.findField(fieldName)
+    if (field.isAccessible == false) {
+        field.isAccessible = true
+        defer {
+            field.isAccessible = false
         }
     }
+
+    if (field.modifiers and Modifier.FINAL.inv() != 0) {
+        val modifiers = Field::class.java.getDeclaredField("modifiers")
+        modifiers.isAccessible = true
+        modifiers.setInt(field, field.modifiers and Modifier.FINAL.inv())
+        defer {
+            modifiers.setInt(field, field.modifiers or Modifier.FINAL)
+            modifiers.isAccessible = false
+        }
+    }
+
+    field.set(this, value)
 }
+
+private fun Class<in Any>.findField(fieldName: String): Field =
+        declaredFields.firstOrNull { it.name == fieldName }
+                ?: superclass?.findField(fieldName)
+                ?: throw NoSuchFieldException(fieldName)

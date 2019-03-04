@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,48 +20,38 @@
  * SOFTWARE.
  */
 
-package bill.catbox.home
+package bill.catbox.home.boxes
 
-import bill.catbox.game.GameEngine
 import bill.catbox.game.GameNode
 import bill.catbox.game.GameState
-import bill.catbox.navigation.Navigator
+import bill.catbox.game.GameStateContainer
 import bill.catbox.settings.SettingsRepository
 import bill.catbox.test.ReactiveTestRule
-import bill.catbox.test.nonNull
 import bill.reaktive.Publishers
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Answers
-import org.mockito.Mock
-import org.mockito.Mockito.*
-import org.mockito.MockitoAnnotations
 
-class HomePresenterTests {
+class BoxesPresenterTests {
 
     @get:Rule
     val reactiveTestRule = ReactiveTestRule()
 
-    @Mock(answer = Answers.RETURNS_MOCKS)
-    private lateinit var view: HomeView
+    private lateinit var view: BoxesView
+    private lateinit var game: GameStateContainer
 
-    @Mock
-    private lateinit var game: GameEngine
-
-    @Mock
-    private lateinit var navigator: Navigator
-
-    @Mock(answer = Answers.RETURNS_MOCKS)
-    private lateinit var settingsRepository: SettingsRepository
-
-    private lateinit var presenter: HomePresenter
+    private lateinit var presenter: BoxesPresenter
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        view = mockk(relaxed = true)
+        game = mockk(relaxed = true)
+        val settingsRepository: SettingsRepository = mockk(relaxed = true)
 
-        presenter = HomePresenter(view, game, navigator, settingsRepository)
+        presenter = BoxesPresenter(view, game, settingsRepository)
     }
 
     @Test
@@ -74,14 +64,16 @@ class HomePresenterTests {
 
     @Test
     fun `should call view_onCatFound when cat is found`() {
-        `when`(view.boxChosenEvent).thenReturn(Publishers.elements(0))
+        every { view.boxChosenEvent } returns Publishers.elements(0)
 
         val catFoundGameNode = GameNode(listOf(0), listOf(0))
         val catFoundState = GameState(1, listOf(catFoundGameNode))
-        `when`(game.play(nonNull(), anyInt())).thenReturn(catFoundState)
+        every { game.play(any()) } returns catFoundState
 
         presenter.attach()
 
-        verify(view).onCatFound(anyInt())
+        verify {
+            view.onCatFound(any())
+        }
     }
 }

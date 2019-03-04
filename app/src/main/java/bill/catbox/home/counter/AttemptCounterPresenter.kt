@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,28 @@
  * SOFTWARE.
  */
 
-package bill.catbox.test
+package bill.catbox.home.counter
 
-import bill.reaktive.TestMode
-import org.junit.rules.TestRule
-import org.junit.runner.Description
-import org.junit.runners.model.Statement
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import bill.catbox.game.GameStateContainer
+import bill.reaktive.SubscriptionBag
 
-class ReactiveTestRule : TestRule {
+class AttemptCounterPresenter(private val view: AttemptCounterView,
+                              private val game: GameStateContainer = GameStateContainer) : LifecycleObserver {
 
-    override fun apply(base: Statement, description: Description?) = object : Statement() {
-        override fun evaluate() {
-            TestMode.isEnabled = true
+    private val subscriptions = SubscriptionBag()
 
-            base.evaluate()
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun attach() {
+        subscriptions += game.gameStateChanged
+                .signalOnForeground()
+                .subscribe { view.count = it.attempts }
+    }
 
-            TestMode.isEnabled = false
-        }
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun detach() {
+        subscriptions.clear()
     }
 }

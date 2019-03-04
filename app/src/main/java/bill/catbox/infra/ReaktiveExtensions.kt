@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,10 @@
  * SOFTWARE.
  */
 
-package bill.catbox.test
+package bill.catbox.infra
 
-import bill.reaktive.TestMode
-import org.junit.rules.TestRule
-import org.junit.runner.Description
-import org.junit.runners.model.Statement
+import bill.reaktive.Publisher
+import timber.log.Timber
 
-class ReactiveTestRule : TestRule {
-
-    override fun apply(base: Statement, description: Description?) = object : Statement() {
-        override fun evaluate() {
-            TestMode.isEnabled = true
-
-            base.evaluate()
-
-            TestMode.isEnabled = false
-        }
-    }
-}
+fun <T> Publisher<T>.debug(lazyMessage: (T) -> String) =
+        doOnNext { Timber.d(lazyMessage(it)) }

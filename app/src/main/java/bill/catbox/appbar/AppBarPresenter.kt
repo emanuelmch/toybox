@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,31 @@
  * SOFTWARE.
  */
 
-package bill.catbox.test
+package bill.catbox.appbar
 
-import bill.reaktive.TestMode
-import org.junit.rules.TestRule
-import org.junit.runner.Description
-import org.junit.runners.model.Statement
+import android.view.MenuItem
+import bill.catbox.R
+import bill.catbox.infra.ObservableActivity
+import bill.catbox.settings.SettingsActivity
 
-class ReactiveTestRule : TestRule {
+class AppBarPresenter {
 
-    override fun apply(base: Statement, description: Description?) = object : Statement() {
-        override fun evaluate() {
-            TestMode.isEnabled = true
+    fun observe(activity: ObservableActivity) {
+        activity.onOptionsItemSelectedListener = this::onOptionsItemSelected
+        activity.onDestroyListeners += this::onDestroy
+    }
 
-            base.evaluate()
-
-            TestMode.isEnabled = false
+    private fun onOptionsItemSelected(context: ObservableActivity, item: MenuItem?): Boolean {
+        if (item?.itemId == R.id.actionSettings) {
+            SettingsActivity.startActivity(context)
+            return true
         }
+
+        return false
+    }
+
+    private fun onDestroy(context: ObservableActivity) {
+        context.onDestroyListeners -= this::onDestroy
+        context.onOptionsItemSelectedListener = null
     }
 }

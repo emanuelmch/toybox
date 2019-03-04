@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,19 +20,24 @@
  * SOFTWARE.
  */
 
-package bill.catbox.navigation
+package bill.catbox.home.boxes
 
-import android.content.Context
-import bill.catbox.R
-import bill.catbox.settings.SettingsActivity
+import androidx.recyclerview.widget.MockRecyclerView
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Test
 
-open class Navigator(private val context: Context) {
+class BoxesViewTests {
 
-    fun navigateFromMenu(menuId: Int) {
-        if (menuId == R.id.actionSettings) {
-            SettingsActivity.startActivity(context)
-        } else {
-            throw IllegalArgumentException("Illegal menuId requested: $menuId")
-        }
+    @Test
+    fun `should attach an Adapter with the correct box count to the RecyclerView`() {
+        val boxes = MockRecyclerView.create()
+
+        val view = BoxesView(boxes)
+        view.startGame(3)
+
+        assertThat(boxes.adapter, `is`(notNullValue()))
+        assertThat(boxes.adapter!!.itemCount, `is`(3))
     }
 }
