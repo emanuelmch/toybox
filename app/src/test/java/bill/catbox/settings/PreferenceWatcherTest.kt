@@ -57,7 +57,7 @@ class PreferenceWatcherTest {
                 .watchInt("key", 1984)
                 .test()
 
-        subscriber.assertValuesOnly(1984)
+        subscriber.assertEmittedValues(1984)
         subscriber.cancel()
         subscriber.assertNoErrors()
     }
@@ -68,7 +68,7 @@ class PreferenceWatcherTest {
         val subscriber = PreferenceWatcher(sharedPrefs).watchInt("key").test()
         sharedPrefs.setInt("key", 124)
 
-        subscriber.assertValuesOnly(123, 124)
+        subscriber.assertEmittedValues(123, 124)
         subscriber.cancel()
         subscriber.assertNoErrors()
     }
@@ -81,13 +81,13 @@ class PreferenceWatcherTest {
         val subscriber2 = PreferenceWatcher(sharedPrefs).watchInt("key").test()
         sharedPrefs.setInt("key", 125)
 
-        subscriber1.assertValuesOnly(123, 124, 125)
+        subscriber1.assertEmittedValues(123, 124, 125)
         subscriber1.cancel()
         subscriber1.assertNoErrors()
 
         sharedPrefs.setInt("key", 126)
 
-        subscriber2.assertValuesOnly(124, 125, 126)
+        subscriber2.assertEmittedValues(124, 125, 126)
         subscriber2.cancel()
         subscriber2.assertNoErrors()
     }
