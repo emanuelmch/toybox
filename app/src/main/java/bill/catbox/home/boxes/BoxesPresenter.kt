@@ -48,12 +48,14 @@ class BoxesPresenter(private val view: BoxesView,
         Timber.d("Presenter::attach")
 
         subscriptions += settings.watchBoxCount()
-                .subscribe { game.newGame(it) }
+                .doOnNext { game.newGame(it) }
+                .subscribe()
 
         subscriptions += game.gameStateChanged
                 .filter(GameState::isNewGame)
                 .signalOnForeground()
-                .subscribe { view.startGame(it.boxCount) }
+                .doOnNext { view.startGame(it.boxCount) }
+                .subscribe()
 
         subscriptions += view.boxChosenEvent
                 .signalOnBackground()
@@ -65,13 +67,14 @@ class BoxesPresenter(private val view: BoxesView,
                     }
                 }
                 .signalOnForeground()
-                .subscribe { game ->
+                .doOnNext { game ->
                     if (game.isCatFound) {
                         view.onCatFound(game.attempts)
                     } else {
                         view.onEmptyBox(game.attempts)
                     }
                 }
+                .subscribe()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
