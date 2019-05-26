@@ -21,7 +21,7 @@
   -->
 
 <resources>
-    <string name="app_name">The Cat In The Box</string>
+    <string name="app_name">Toy Box</string>
     <string name="box_number">Box %d</string>
 
     <plurals name="cat_found">
