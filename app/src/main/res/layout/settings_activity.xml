@@ -24,7 +24,7 @@
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content"
-    android:name="bill.catbox.settings.SettingsFragment"
+    android:name="bill.toybox.catbox.settings.SettingsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="bill.catbox.settings.SettingsActivity" />
+    tools:context="bill.toybox.catbox.settings.SettingsActivity" />

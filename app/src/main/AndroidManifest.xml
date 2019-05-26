@@ -22,7 +22,7 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="bill.catbox">
+    package="bill.toybox">
 
     <application
         android:name=".CatBoxApplication"
@@ -32,7 +32,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".home.HomeActivity">
+        <activity android:name=".catbox.home.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -40,9 +40,9 @@
         </activity>
 
         <activity
-            android:name=".settings.SettingsActivity"
+            android:name=".catbox.settings.SettingsActivity"
             android:label="@string/settings"
-            android:parentActivityName=".home.HomeActivity" />
+            android:parentActivityName=".catbox.home.HomeActivity" />
     </application>
 
 </manifest>

@@ -20,33 +20,34 @@
  * SOFTWARE.
  */
 
-package androidx.recyclerview.widget
+package bill.toybox.test
 
-import bill.toybox.test.forceSet
-import io.mockk.every
-import io.mockk.mockk
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 
-class MockRecyclerView {
-
-    private class MockAdapterDataObservable : RecyclerView.AdapterDataObservable() {
-        override fun notifyChanged() = Unit
-    }
-
-    companion object {
-        fun create(): RecyclerView {
-            val view: RecyclerView = mockk(relaxed = true)
-            var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
-
-            every { view.adapter } answers { adapter }
-
-            every {
-                view.adapter = any()
-            } propertyType RecyclerView.Adapter::class answers {
-                value.forceSet("mObservable", MockAdapterDataObservable())
-                adapter = value
-            }
-
-            return view
+fun Any.forceSet(fieldName: String, value: Any) = deferring { defer ->
+    val field = javaClass.findField(fieldName)
+    if (field.isAccessible == false) {
+        field.isAccessible = true
+        defer {
+            field.isAccessible = false
         }
     }
+
+    if (field.modifiers and Modifier.FINAL.inv() != 0) {
+        val modifiers = Field::class.java.getDeclaredField("modifiers")
+        modifiers.isAccessible = true
+        modifiers.setInt(field, field.modifiers and Modifier.FINAL.inv())
+        defer {
+            modifiers.setInt(field, field.modifiers or Modifier.FINAL)
+            modifiers.isAccessible = false
+        }
+    }
+
+    field.set(this, value)
 }
+
+private fun Class<in Any>.findField(fieldName: String): Field =
+        declaredFields.firstOrNull { it.name == fieldName }
+                ?: superclass?.findField(fieldName)
+                ?: throw NoSuchFieldException(fieldName)

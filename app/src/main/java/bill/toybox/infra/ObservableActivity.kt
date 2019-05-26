@@ -20,33 +20,25 @@
  * SOFTWARE.
  */
 
-package androidx.recyclerview.widget
+package bill.toybox.infra
 
-import bill.toybox.test.forceSet
-import io.mockk.every
-import io.mockk.mockk
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 
-class MockRecyclerView {
+abstract class ObservableActivity : AppCompatActivity() {
+    var onOptionsItemSelectedListener: ((ObservableActivity, MenuItem) -> Boolean)? = null
+    var onDestroyListeners = listOf<(ObservableActivity) -> Unit>()
 
-    private class MockAdapterDataObservable : RecyclerView.AdapterDataObservable() {
-        override fun notifyChanged() = Unit
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item != null) {
+            onOptionsItemSelectedListener?.invoke(this, item)
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
-    companion object {
-        fun create(): RecyclerView {
-            val view: RecyclerView = mockk(relaxed = true)
-            var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
-
-            every { view.adapter } answers { adapter }
-
-            every {
-                view.adapter = any()
-            } propertyType RecyclerView.Adapter::class answers {
-                value.forceSet("mObservable", MockAdapterDataObservable())
-                adapter = value
-            }
-
-            return view
-        }
+    override fun onDestroy() {
+        onDestroyListeners.forEach { it.invoke(this) }
+        super.onDestroy()
     }
 }

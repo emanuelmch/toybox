@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,33 +20,22 @@
  * SOFTWARE.
  */
 
-package androidx.recyclerview.widget
+package bill.toybox
 
-import bill.toybox.test.forceSet
-import io.mockk.every
-import io.mockk.mockk
+import android.app.Application
+import android.preference.PreferenceManager
+import timber.log.Timber
 
-class MockRecyclerView {
+@Suppress("unused")
+class CatBoxApplication : Application() {
 
-    private class MockAdapterDataObservable : RecyclerView.AdapterDataObservable() {
-        override fun notifyChanged() = Unit
-    }
+    override fun onCreate() {
+        super.onCreate()
 
-    companion object {
-        fun create(): RecyclerView {
-            val view: RecyclerView = mockk(relaxed = true)
-            var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
-
-            every { view.adapter } answers { adapter }
-
-            every {
-                view.adapter = any()
-            } propertyType RecyclerView.Adapter::class answers {
-                value.forceSet("mObservable", MockAdapterDataObservable())
-                adapter = value
-            }
-
-            return view
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
         }
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
     }
 }
