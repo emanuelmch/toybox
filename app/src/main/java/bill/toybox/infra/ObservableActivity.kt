@@ -24,21 +24,61 @@ package bill.toybox.infra
 
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import bill.reaktive.Publisher
+
+private enum class Lifecycle { RESUME, PAUSE }
 
 abstract class ObservableActivity : AppCompatActivity() {
-    var onOptionsItemSelectedListener: ((ObservableActivity, MenuItem) -> Boolean)? = null
-    var onDestroyListeners = listOf<(ObservableActivity) -> Unit>()
 
+    private val lifecycleObservers = mutableSetOf<Observer>()
+    var onOptionsItemSelectedObserver: ((ObservableActivity, MenuItem) -> Boolean)? = null
+
+    //region Activity overrides
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item != null) {
-            onOptionsItemSelectedListener?.invoke(this, item)
+            onOptionsItemSelectedObserver?.invoke(this, item)
         }
 
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onResume() {
+        super.onResume()
+        lifecycleObservers.filter { it.lifecycle == Lifecycle.RESUME }
+                .forEach(Observer::run)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        lifecycleObservers.filter { it.lifecycle == Lifecycle.PAUSE }
+                .forEach(Observer::run)
+    }
+
     override fun onDestroy() {
-        onDestroyListeners.forEach { it.invoke(this) }
+        lifecycleObservers.clear()
         super.onDestroy()
+    }
+    //endregion Activity overrides
+
+    fun doOnResume(action: ObservableActivity.() -> Unit) {
+        lifecycleObservers.add(Observer(Lifecycle.RESUME, action))
+    }
+
+    fun <T> Publisher<T>.subscribeUntilPause() {
+        val subscription = subscribe()
+        lifecycleObservers += Observer(Lifecycle.PAUSE, subscription::cancel, oneTimeRun = true)
+    }
+
+    private inner class Observer(val lifecycle: Lifecycle,
+                                 val action: ObservableActivity.() -> Unit,
+                                 val oneTimeRun: Boolean = false) {
+
+        constructor(lifecycle: Lifecycle, noArgsAction: () -> Unit, oneTimeRun: Boolean = false) :
+                this(lifecycle, action = { noArgsAction.invoke() }, oneTimeRun = oneTimeRun)
+
+        fun run() {
+            action.invoke(this@ObservableActivity)
+            if (oneTimeRun) lifecycleObservers -= this
+        }
     }
 }

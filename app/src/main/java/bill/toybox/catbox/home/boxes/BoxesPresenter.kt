@@ -23,63 +23,49 @@
 package bill.toybox.catbox.home.boxes
 
 import android.content.Context
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import bill.reaktive.SubscriptionBag
 import bill.toybox.catbox.game.GameState
 import bill.toybox.catbox.game.GameStateContainer
 import bill.toybox.catbox.settings.SettingsRepository
+import bill.toybox.infra.ObservableActivity
 import bill.toybox.infra.debug
-import timber.log.Timber
 
 class BoxesPresenter(private val view: BoxesView,
                      private val game: GameStateContainer,
-                     private val settings: SettingsRepository
-) : LifecycleObserver {
+                     private val settings: SettingsRepository) {
 
     constructor(context: Context, view: BoxesView, game: GameStateContainer = GameStateContainer)
             : this(view, game, SettingsRepository(context))
 
-    private val subscriptions = SubscriptionBag()
+    fun observe(activity: ObservableActivity) {
+        activity.doOnResume {
+            settings.watchBoxCount()
+                    .doOnNext { game.newGame(it) }
+                    .subscribeUntilPause()
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun attach() {
-        Timber.d("Presenter::attach")
+            game.gameStateChanged
+                    .filter(GameState::isNewGame)
+                    .signalOnForeground()
+                    .doOnNext { view.startGame(it.boxCount) }
+                    .subscribeUntilPause()
 
-        subscriptions += settings.watchBoxCount()
-                .doOnNext { game.newGame(it) }
-                .subscribe()
-
-        subscriptions += game.gameStateChanged
-                .filter(GameState::isNewGame)
-                .signalOnForeground()
-                .doOnNext { view.startGame(it.boxCount) }
-                .subscribe()
-
-        subscriptions += view.boxChosenEvent
-                .signalOnBackground()
-                .debug { "Box #$it chosen" }
-                .map(game::play)
-                .doOnNext {
-                    if (it.isCatFound) {
-                        Thread.sleep(2000)
+            view.boxChosenEvent
+                    .signalOnBackground()
+                    .debug { "Box #$it chosen" }
+                    .map(game::play)
+                    .doOnNext {
+                        if (it.isCatFound) {
+                            Thread.sleep(2000)
+                        }
                     }
-                }
-                .signalOnForeground()
-                .doOnNext { game ->
-                    if (game.isCatFound) {
-                        view.onCatFound(game.attempts)
-                    } else {
-                        view.onEmptyBox(game.attempts)
+                    .signalOnForeground()
+                    .doOnNext { game ->
+                        if (game.isCatFound) {
+                            view.onCatFound(game.attempts)
+                        } else {
+                            view.onEmptyBox(game.attempts)
+                        }
                     }
-                }
-                .subscribe()
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun detach() {
-        Timber.d("Presenter::detach")
-        subscriptions.clear()
+                    .subscribeUntilPause()
+        }
     }
 }

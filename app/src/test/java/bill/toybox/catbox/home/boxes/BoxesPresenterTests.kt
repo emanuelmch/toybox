@@ -22,12 +22,13 @@
 
 package bill.toybox.catbox.home.boxes
 
+import bill.reaktive.Publishers
 import bill.toybox.catbox.game.GameNode
 import bill.toybox.catbox.game.GameState
 import bill.toybox.catbox.game.GameStateContainer
 import bill.toybox.catbox.settings.SettingsRepository
+import bill.toybox.test.MockObservableActivity
 import bill.toybox.test.ReactiveTestRule
-import bill.reaktive.Publishers
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -39,6 +40,9 @@ class BoxesPresenterTests {
 
     @get:Rule
     val reactiveTestRule = ReactiveTestRule()
+
+    @get:Rule
+    val activity = MockObservableActivity.create()
 
     private lateinit var view: BoxesView
     private lateinit var game: GameStateContainer
@@ -52,14 +56,7 @@ class BoxesPresenterTests {
         val settingsRepository: SettingsRepository = mockk(relaxed = true)
 
         presenter = BoxesPresenter(view, game, settingsRepository)
-    }
-
-    @Test
-    fun `should attach and detach without exceptions`() {
-        presenter.apply {
-            attach()
-            detach()
-        }
+        presenter.observe(activity)
     }
 
     @Test
@@ -70,7 +67,7 @@ class BoxesPresenterTests {
         val catFoundState = GameState(1, listOf(catFoundGameNode))
         every { game.play(any()) } returns catFoundState
 
-        presenter.attach()
+        activity.onResume()
 
         verify {
             view.onCatFound(any())

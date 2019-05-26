@@ -30,8 +30,7 @@ import bill.toybox.infra.ObservableActivity
 class AppBarPresenter {
 
     fun observe(activity: ObservableActivity) {
-        activity.onOptionsItemSelectedListener = this::onOptionsItemSelected
-        activity.onDestroyListeners += this::onDestroy
+        activity.onOptionsItemSelectedObserver = this::onOptionsItemSelected
     }
 
     private fun onOptionsItemSelected(context: ObservableActivity, item: MenuItem?): Boolean {
@@ -41,10 +40,5 @@ class AppBarPresenter {
         }
 
         return false
-    }
-
-    private fun onDestroy(context: ObservableActivity) {
-        context.onDestroyListeners -= this::onDestroy
-        context.onOptionsItemSelectedListener = null
     }
 }
