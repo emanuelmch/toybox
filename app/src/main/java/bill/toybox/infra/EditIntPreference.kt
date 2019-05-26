@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,33 +20,20 @@
  * SOFTWARE.
  */
 
-package androidx.recyclerview.widget
+package bill.toybox.infra
 
-import bill.toybox.test.forceSet
-import io.mockk.every
-import io.mockk.mockk
+import android.content.Context
+import android.preference.EditTextPreference
+import android.util.AttributeSet
 
-class MockRecyclerView {
+//FIXME: Should have a better UI
+class EditIntPreference @JvmOverloads constructor(
+        context: Context?,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = android.R.attr.editTextPreferenceStyle
+) : EditTextPreference(context, attrs, defStyleAttr) {
 
-    private class MockAdapterDataObservable : RecyclerView.AdapterDataObservable() {
-        override fun notifyChanged() = Unit
-    }
+    override fun getPersistedString(defaultReturnValue: String?) = getPersistedInt(-1).toString()
 
-    companion object {
-        fun create(): RecyclerView {
-            val view: RecyclerView = mockk(relaxed = true)
-            var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
-
-            every { view.adapter } answers { adapter }
-
-            every {
-                view.adapter = any()
-            } propertyType RecyclerView.Adapter::class answers {
-                value.forceSet("mObservable", MockAdapterDataObservable())
-                adapter = value
-            }
-
-            return view
-        }
-    }
+    override fun persistString(value: String) = persistInt(value.toInt())
 }

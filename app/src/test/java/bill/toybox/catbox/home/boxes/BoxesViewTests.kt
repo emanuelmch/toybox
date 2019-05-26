@@ -20,33 +20,24 @@
  * SOFTWARE.
  */
 
-package androidx.recyclerview.widget
+package bill.toybox.catbox.home.boxes
 
-import bill.toybox.test.forceSet
-import io.mockk.every
-import io.mockk.mockk
+import androidx.recyclerview.widget.MockRecyclerView
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Test
 
-class MockRecyclerView {
+class BoxesViewTests {
 
-    private class MockAdapterDataObservable : RecyclerView.AdapterDataObservable() {
-        override fun notifyChanged() = Unit
-    }
+    @Test
+    fun `should attach an Adapter with the correct box count to the RecyclerView`() {
+        val boxes = MockRecyclerView.create()
 
-    companion object {
-        fun create(): RecyclerView {
-            val view: RecyclerView = mockk(relaxed = true)
-            var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
+        val view = BoxesView(boxes)
+        view.startGame(3)
 
-            every { view.adapter } answers { adapter }
-
-            every {
-                view.adapter = any()
-            } propertyType RecyclerView.Adapter::class answers {
-                value.forceSet("mObservable", MockAdapterDataObservable())
-                adapter = value
-            }
-
-            return view
-        }
+        assertThat(boxes.adapter, `is`(notNullValue()))
+        assertThat(boxes.adapter!!.itemCount, `is`(3))
     }
 }

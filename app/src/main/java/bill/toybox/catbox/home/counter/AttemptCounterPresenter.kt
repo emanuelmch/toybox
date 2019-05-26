@@ -20,33 +20,29 @@
  * SOFTWARE.
  */
 
-package androidx.recyclerview.widget
+package bill.toybox.catbox.home.counter
 
-import bill.toybox.test.forceSet
-import io.mockk.every
-import io.mockk.mockk
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import bill.reaktive.SubscriptionBag
+import bill.toybox.catbox.game.GameStateContainer
 
-class MockRecyclerView {
+class AttemptCounterPresenter(private val view: AttemptCounterView,
+                              private val game: GameStateContainer = GameStateContainer) : LifecycleObserver {
 
-    private class MockAdapterDataObservable : RecyclerView.AdapterDataObservable() {
-        override fun notifyChanged() = Unit
+    private val subscriptions = SubscriptionBag()
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun attach() {
+        subscriptions += game.gameStateChanged
+                .signalOnForeground()
+                .doOnNext { view.count = it.attempts }
+                .subscribe()
     }
 
-    companion object {
-        fun create(): RecyclerView {
-            val view: RecyclerView = mockk(relaxed = true)
-            var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
-
-            every { view.adapter } answers { adapter }
-
-            every {
-                view.adapter = any()
-            } propertyType RecyclerView.Adapter::class answers {
-                value.forceSet("mObservable", MockAdapterDataObservable())
-                adapter = value
-            }
-
-            return view
-        }
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun detach() {
+        subscriptions.clear()
     }
 }

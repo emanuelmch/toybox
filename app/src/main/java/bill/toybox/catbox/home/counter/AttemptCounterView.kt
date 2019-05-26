@@ -20,33 +20,21 @@
  * SOFTWARE.
  */
 
-package androidx.recyclerview.widget
+package bill.toybox.catbox.home.counter
 
-import bill.toybox.test.forceSet
-import io.mockk.every
-import io.mockk.mockk
+import android.os.Looper
+import android.widget.TextView
+import bill.toybox.infra.toInt
+import timber.log.Timber
 
-class MockRecyclerView {
+class AttemptCounterView(private val counter: TextView) {
 
-    private class MockAdapterDataObservable : RecyclerView.AdapterDataObservable() {
-        override fun notifyChanged() = Unit
-    }
+    var count: Int
+        get() = counter.text?.toInt() ?: 0
+        set(value) {
+            assert(Looper.getMainLooper().thread == Thread.currentThread()) { "Setter should be called from the UI thread" }
 
-    companion object {
-        fun create(): RecyclerView {
-            val view: RecyclerView = mockk(relaxed = true)
-            var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
-
-            every { view.adapter } answers { adapter }
-
-            every {
-                view.adapter = any()
-            } propertyType RecyclerView.Adapter::class answers {
-                value.forceSet("mObservable", MockAdapterDataObservable())
-                adapter = value
-            }
-
-            return view
+            Timber.d(value.toString())
+            counter.text = value.toString()
         }
-    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,33 +20,34 @@
  * SOFTWARE.
  */
 
-package androidx.recyclerview.widget
+package bill.toybox.catbox.home
 
-import bill.toybox.test.forceSet
-import io.mockk.every
-import io.mockk.mockk
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.filters.LargeTest
+import androidx.test.rule.ActivityTestRule
+import androidx.test.runner.AndroidJUnit4
+import bill.toybox.R
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
-class MockRecyclerView {
+@RunWith(AndroidJUnit4::class)
+@LargeTest
+class HomeNavigationTests {
 
-    private class MockAdapterDataObservable : RecyclerView.AdapterDataObservable() {
-        override fun notifyChanged() = Unit
-    }
+    @get:Rule
+    val homeActivity = ActivityTestRule(HomeActivity::class.java)
 
-    companion object {
-        fun create(): RecyclerView {
-            val view: RecyclerView = mockk(relaxed = true)
-            var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
+    @Test
+    fun testNavigatingToSettings() {
+        onView(withId(R.id.actionSettings))
+                .perform(click())
 
-            every { view.adapter } answers { adapter }
-
-            every {
-                view.adapter = any()
-            } propertyType RecyclerView.Adapter::class answers {
-                value.forceSet("mObservable", MockAdapterDataObservable())
-                adapter = value
-            }
-
-            return view
-        }
+        //TODO: Try and find a more reliable way of checking we moved screen
+        onView(withText(R.string.settings))
+                .check(matches(isDisplayed()))
     }
 }

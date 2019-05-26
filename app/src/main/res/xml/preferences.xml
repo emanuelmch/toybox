@@ -23,7 +23,7 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- TODO Make a custom NumberPreference -->
-    <bill.catbox.infra.EditIntPreference
+    <bill.toybox.infra.EditIntPreference
         android:defaultValue="5"
         android:inputType="number"
         android:key="pref_boxCount"

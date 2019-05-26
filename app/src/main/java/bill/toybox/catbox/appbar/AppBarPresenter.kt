@@ -20,33 +20,31 @@
  * SOFTWARE.
  */
 
-package androidx.recyclerview.widget
+package bill.toybox.catbox.appbar
 
-import bill.toybox.test.forceSet
-import io.mockk.every
-import io.mockk.mockk
+import android.view.MenuItem
+import bill.toybox.R
+import bill.toybox.catbox.settings.SettingsActivity
+import bill.toybox.infra.ObservableActivity
 
-class MockRecyclerView {
+class AppBarPresenter {
 
-    private class MockAdapterDataObservable : RecyclerView.AdapterDataObservable() {
-        override fun notifyChanged() = Unit
+    fun observe(activity: ObservableActivity) {
+        activity.onOptionsItemSelectedListener = this::onOptionsItemSelected
+        activity.onDestroyListeners += this::onDestroy
     }
 
-    companion object {
-        fun create(): RecyclerView {
-            val view: RecyclerView = mockk(relaxed = true)
-            var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
-
-            every { view.adapter } answers { adapter }
-
-            every {
-                view.adapter = any()
-            } propertyType RecyclerView.Adapter::class answers {
-                value.forceSet("mObservable", MockAdapterDataObservable())
-                adapter = value
-            }
-
-            return view
+    private fun onOptionsItemSelected(context: ObservableActivity, item: MenuItem?): Boolean {
+        if (item?.itemId == R.id.actionSettings) {
+            SettingsActivity.startActivity(context)
+            return true
         }
+
+        return false
+    }
+
+    private fun onDestroy(context: ObservableActivity) {
+        context.onDestroyListeners -= this::onDestroy
+        context.onOptionsItemSelectedListener = null
     }
 }

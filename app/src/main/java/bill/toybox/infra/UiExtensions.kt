@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,33 +20,36 @@
  * SOFTWARE.
  */
 
-package androidx.recyclerview.widget
+package bill.toybox.infra
 
-import bill.toybox.test.forceSet
-import io.mockk.every
-import io.mockk.mockk
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.LayoutRes
+import com.google.android.material.snackbar.Snackbar
 
-class MockRecyclerView {
+fun View.snackbar(text: String) {
+    Snackbar.make(this, text, Snackbar.LENGTH_SHORT)
+            .apply(Snackbar::show)
+}
 
-    private class MockAdapterDataObservable : RecyclerView.AdapterDataObservable() {
-        override fun notifyChanged() = Unit
-    }
-
-    companion object {
-        fun create(): RecyclerView {
-            val view: RecyclerView = mockk(relaxed = true)
-            var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
-
-            every { view.adapter } answers { adapter }
-
-            every {
-                view.adapter = any()
-            } propertyType RecyclerView.Adapter::class answers {
-                value.forceSet("mObservable", MockAdapterDataObservable())
-                adapter = value
-            }
-
-            return view
+// TODO: Should we ask for Context and get text from resources?
+fun Int.toOrdinal(): String {
+    val suffix = if ((this % 100) in 4..19) {
+        "th"
+    } else {
+        when (this % 10) {
+            1 -> "st"
+            2 -> "nd"
+            3 -> "rd"
+            else -> "th"
         }
     }
+
+    return this.toString() + suffix
 }
+
+fun ViewGroup.inflateChild(@LayoutRes resource: Int): View =
+        LayoutInflater.from(context).inflate(resource, this, false)
+
+fun CharSequence.toInt(): Int = Integer.parseInt(this.toString())
