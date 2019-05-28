@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,45 +20,32 @@
  * SOFTWARE.
  */
 
-package bill.toybox.catbox.home
+package bill.toybox.hub
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import bill.toybox.R
-import bill.toybox.catbox.appbar.AppBarPresenter
-import bill.toybox.catbox.home.boxes.BoxesPresenter
-import bill.toybox.catbox.home.boxes.BoxesView
-import bill.toybox.catbox.home.counter.AttemptCounterPresenter
-import bill.toybox.catbox.home.counter.AttemptCounterView
+import bill.toybox.catbox.home.HomeActivity
 import bill.toybox.infra.ObservableActivity
-import kotlinx.android.synthetic.main.home_view.*
+import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.hub_activity.*
 
-class HomeActivity : ObservableActivity() {
+class HubActivity : ObservableActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.home_view)
-
-        AppBarPresenter().observe(this)
-
-        val boxesView = BoxesView(this.boxes)
-        BoxesPresenter(this, boxesView).observe(this)
-
-        val counterView = AttemptCounterView(this.attemptCounter)
-        AttemptCounterPresenter(counterView).observe(this)
+        setContentView(R.layout.hub_activity)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
+    override fun onResume() {
+        super.onResume()
 
-    companion object {
-        fun startActivity(context: Context) {
-            val intent = Intent(context, HomeActivity::class.java)
-            context.startActivity(intent)
+        catImage.setOnClickListener {
+            HomeActivity.startActivity(this)
         }
+
+        Glide.with(this)
+                .load("https://i.imgur.com/guEhXZP.jpg")
+                .centerCrop()
+                .into(catImage)
     }
 }
