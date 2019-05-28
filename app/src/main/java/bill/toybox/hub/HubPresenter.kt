@@ -22,18 +22,18 @@
 
 package bill.toybox.hub
 
-import android.os.Bundle
-import bill.toybox.R
+import bill.toybox.catbox.home.HomeActivity
 import bill.toybox.infra.ObservableActivity
-import kotlinx.android.synthetic.main.hub_activity.*
 
-class HubActivity : ObservableActivity() {
+class HubPresenter(private val view: HubView) {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.hub_activity)
+    fun observe(activity: ObservableActivity) {
+        activity.doOnResume {
+            view.loadImage("https://i.imgur.com/guEhXZP.jpg")
 
-        val view = HubView(this.container)
-        HubPresenter(view).observe(this)
+            view.clicks
+                    .doOnNext { HomeActivity.startActivity(activity) }
+                    .subscribeUntilPause()
+        }
     }
 }

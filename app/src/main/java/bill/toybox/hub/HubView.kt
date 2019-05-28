@@ -22,18 +22,19 @@
 
 package bill.toybox.hub
 
-import android.os.Bundle
-import bill.toybox.R
-import bill.toybox.infra.ObservableActivity
-import kotlinx.android.synthetic.main.hub_activity.*
+import android.view.View
+import bill.reaktive.UiPublishers
+import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.hub_activity.view.*
 
-class HubActivity : ObservableActivity() {
+class HubView(private val rootView: View) {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.hub_activity)
+    val clicks = UiPublishers.clicks(rootView.catImage)
 
-        val view = HubView(this.container)
-        HubPresenter(view).observe(this)
+    fun loadImage(url: String) {
+        Glide.with(rootView)
+                .load(url)
+                .centerCrop()
+                .into(rootView.catImage)
     }
 }
