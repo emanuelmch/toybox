@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Emanuel Machado da Silva <emanuel.mch@gmail.com>
+ * Copyright (c) 2019 Emanuel Machado da Silva <emanuel.mch@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,34 +20,32 @@
  * SOFTWARE.
  */
 
-package bill.toybox.catbox.home
+package bill.toybox.catbox
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
+import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import bill.toybox.R
+import bill.toybox.catbox.home.HomeActivity
+import bill.toybox.hub.HubActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-@LargeTest
-class HomeNavigationTests {
+class HubTests {
 
     @get:Rule
-    val homeActivity = ActivityTestRule(HomeActivity::class.java)
+    val espressoTestRule = IntentsTestRule(HubActivity::class.java)
 
     @Test
-    fun testNavigatingToSettings() {
-        onView(withId(R.id.actionSettings))
-                .perform(click())
+    fun testNavigatingToCatbox() {
+        onView(withId(R.id.catImage)).perform(click())
 
-        //TODO: Try and find a more reliable way of checking we moved screen
-        onView(withText(R.string.settings))
-                .check(matches(isDisplayed()))
+        Intents.intended(IntentMatchers.hasComponent(HomeActivity::class.java.name))
     }
 }
