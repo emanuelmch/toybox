@@ -22,7 +22,6 @@
 
 package bill.toybox.catbox
 
-import android.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -31,15 +30,11 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import bill.toybox.R
 import bill.toybox.catbox.home.HomeActivity
 import bill.toybox.catbox.settings.SettingsActivity
-import bill.toybox.catbox.test.awaitDisappear
-import bill.toybox.catbox.test.waitForView
-import bill.toybox.catbox.test.withQuantityText
-import bill.toybox.catbox.test.withText
-import org.junit.BeforeClass
+import bill.toybox.catbox.test.*
+import org.junit.ClassRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -91,14 +86,8 @@ class CatboxTests {
 
     companion object {
 
-        @BeforeClass
+        @get:ClassRule
         @JvmStatic
-        fun beforeClass() {
-            val context = InstrumentationRegistry.getInstrumentation().targetContext
-            PreferenceManager.getDefaultSharedPreferences(context).edit().apply {
-                putInt("pref_boxCount", 3)
-                commit()
-            }
-        }
+        val boxCountSetter = SharedPreferencesTestRule("pref_boxCount", 3)
     }
 }
