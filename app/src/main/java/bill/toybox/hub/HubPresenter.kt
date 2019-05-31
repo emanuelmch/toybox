@@ -23,6 +23,7 @@
 package bill.toybox.hub
 
 import bill.toybox.catbox.home.HomeActivity
+import bill.toybox.infinity.InfinityActivity
 import bill.toybox.infra.ObservableActivity
 
 class HubPresenter(private val view: HubView) {
@@ -33,6 +34,12 @@ class HubPresenter(private val view: HubView) {
 
             view.clicks
                     .doOnNext { HomeActivity.startActivity(activity) }
+                    .subscribeUntilPause()
+
+            view.loadImage2("https://free-images.com/or/7e0a/cat_mom_kittens_cats.jpg")
+
+            view.clicks2
+                    .doOnNext { InfinityActivity.startActivity(activity) }
                     .subscribeUntilPause()
         }
     }

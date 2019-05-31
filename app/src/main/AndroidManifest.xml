@@ -47,6 +47,10 @@
             android:label="@string/catbox_title"
             android:parentActivityName=".hub.HubActivity" />
 
+        <activity android:name=".infinity.InfinityActivity"
+            android:label="@string/infinity_title"
+            android:parentActivityName=".hub.HubActivity" />
+
         <activity
             android:name=".catbox.settings.SettingsActivity"
             android:label="@string/settings"

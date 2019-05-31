@@ -51,4 +51,29 @@
         app:layout_constraintBottom_toBottomOf="@id/catImage"
         app:layout_constraintEnd_toEndOf="@id/catImage"
         app:layout_constraintStart_toStartOf="@id/catImage" />
+
+    <ImageView
+        android:id="@+id/infinityImage"
+        android:layout_width="0dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="@dimen/vertical_padding"
+        android:contentDescription="@string/infinity_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/catImage"
+        app:layout_constraintWidth_percent="0.90" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#80000000"
+        android:gravity="center_horizontal"
+        android:importantForAccessibility="no"
+        android:text="@string/infinity_title"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/infinityImage"
+        app:layout_constraintEnd_toEndOf="@id/infinityImage"
+        app:layout_constraintStart_toStartOf="@id/infinityImage" />
 </androidx.constraintlayout.widget.ConstraintLayout>

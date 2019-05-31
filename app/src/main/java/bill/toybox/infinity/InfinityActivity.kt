@@ -20,32 +20,18 @@
  * SOFTWARE.
  */
 
-package bill.toybox.hub
+package bill.toybox.infinity
 
-import android.view.View
-import bill.reaktive.UiPublishers
-import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.hub_activity.view.*
+import android.content.Context
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 
-class HubView(private val rootView: View) {
+class InfinityActivity : AppCompatActivity() {
 
-    val clicks = UiPublishers.clicks(rootView.catImage)
-
-    fun loadImage(url: String) {
-        Glide.with(rootView)
-                .load(url)
-                .centerCrop()
-                .into(rootView.catImage)
-    }
-
-    // FIXME: Make this a list, instead of naming stuff "*2"
-    val clicks2 = UiPublishers.clicks(rootView.infinityImage)
-
-    fun loadImage2(url: String) {
-        Picasso.get()
-                .load(url)
-                .fit()
-                .centerCrop()
-                .into(rootView.infinityImage)
+    companion object {
+        fun startActivity(context: Context) {
+            val intent = Intent(context, InfinityActivity::class.java)
+            context.startActivity(intent)
+        }
     }
 }
