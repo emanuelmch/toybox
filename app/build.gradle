@@ -11,6 +11,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Does this really help? Probably not.
+        kotlinOptions {
+            freeCompilerArgs = ['-Xno-param-assertions', '-Xno-call-assertions', '-Xno-receiver-assertions']
+        }
     }
     buildTypes {
         release {
