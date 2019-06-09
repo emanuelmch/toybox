@@ -42,10 +42,10 @@ class HomeActivity : ObservableActivity() {
         AppBarPresenter().observe(this)
 
         val boxesView = BoxesView(this.boxes)
-        lifecycle.addObserver(BoxesPresenter(this, boxesView))
+        BoxesPresenter(this, boxesView).observe(this)
 
         val counterView = AttemptCounterView(this.attemptCounter)
-        lifecycle.addObserver(AttemptCounterPresenter(counterView))
+        AttemptCounterPresenter(counterView).observe(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

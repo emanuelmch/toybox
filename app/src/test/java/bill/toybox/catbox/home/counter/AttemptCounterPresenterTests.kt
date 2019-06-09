@@ -20,13 +20,11 @@
  * SOFTWARE.
  */
 
-package bill.toybox.catbox.home.boxes
+package bill.toybox.catbox.home.counter
 
 import bill.reaktive.Publishers
-import bill.toybox.catbox.game.GameNode
 import bill.toybox.catbox.game.GameState
 import bill.toybox.catbox.game.GameStateContainer
-import bill.toybox.catbox.settings.SettingsRepository
 import bill.toybox.test.MockObservableActivity
 import bill.toybox.test.ReactiveTestRule
 import io.mockk.every
@@ -36,7 +34,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class BoxesPresenterTests {
+class AttemptCounterPresenterTests {
 
     @get:Rule
     val reactiveTestRule = ReactiveTestRule()
@@ -44,33 +42,40 @@ class BoxesPresenterTests {
     @get:Rule
     val activity = MockObservableActivity.create()
 
-    private lateinit var view: BoxesView
+    private lateinit var view: AttemptCounterView
     private lateinit var game: GameStateContainer
 
-    private lateinit var presenter: BoxesPresenter
+    private lateinit var presenter: AttemptCounterPresenter
 
     @Before
     fun before() {
         view = mockk(relaxed = true)
         game = mockk(relaxed = true)
-        val settingsRepository: SettingsRepository = mockk(relaxed = true)
 
-        presenter = BoxesPresenter(view, game, settingsRepository)
+        presenter = AttemptCounterPresenter(view, game)
         presenter.observe(activity)
     }
 
     @Test
-    fun `should call view_onCatFound when cat is found`() {
-        every { view.boxChosenEvent } returns Publishers.elements(0)
-
-        val catFoundGameNode = GameNode(listOf(0), listOf(0))
-        val catFoundState = GameState(1, listOf(catFoundGameNode))
-        every { game.play(any()) } returns catFoundState
+    fun `should update the view when the attempt count changes`() {
+        val gameState = Publishers.open<GameState>()
+        every { game.gameStateChanged } returns gameState
 
         activity.onResume()
 
+        gameState.onNext(createState(attemptCount = 2))
         verify {
-            view.onCatFound(any())
+            view.count = 2
+        }
+
+        gameState.onNext(createState(attemptCount = 4))
+        verify {
+            view.count = 4
         }
     }
 }
+
+private fun createState(attemptCount: Int) =
+        mockk<GameState>().apply {
+            every { attempts } returns attemptCount
+        }

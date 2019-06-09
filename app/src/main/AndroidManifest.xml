@@ -44,5 +44,4 @@
             android:label="@string/settings"
             android:parentActivityName=".catbox.home.HomeActivity" />
     </application>
-
 </manifest>

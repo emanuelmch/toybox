@@ -22,27 +22,18 @@
 
 package bill.toybox.catbox.home.counter
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import bill.reaktive.SubscriptionBag
 import bill.toybox.catbox.game.GameStateContainer
+import bill.toybox.infra.ObservableActivity
 
 class AttemptCounterPresenter(private val view: AttemptCounterView,
-                              private val game: GameStateContainer = GameStateContainer) : LifecycleObserver {
+                              private val game: GameStateContainer = GameStateContainer) {
 
-    private val subscriptions = SubscriptionBag()
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun attach() {
-        subscriptions += game.gameStateChanged
-                .signalOnForeground()
-                .doOnNext { view.count = it.attempts }
-                .subscribe()
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun detach() {
-        subscriptions.clear()
+    fun observe(activity: ObservableActivity) {
+        activity.doOnResume {
+            game.gameStateChanged
+                    .signalOnForeground()
+                    .doOnNext { view.count = it.attempts }
+                    .subscribeUntilPause()
+        }
     }
 }

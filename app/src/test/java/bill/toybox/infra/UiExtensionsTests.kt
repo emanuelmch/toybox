@@ -23,7 +23,6 @@
 
 package bill.toybox.infra
 
-import bill.toybox.infra.toOrdinal
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Assert.assertThat
