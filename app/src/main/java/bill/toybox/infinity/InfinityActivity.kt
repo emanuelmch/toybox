@@ -24,9 +24,49 @@ package bill.toybox.infinity
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.recyclerview.widget.RecyclerView
+import bill.toybox.R
+import bill.toybox.infinity.cats.CatRepository
+import bill.toybox.infra.ObservableActivity
+import bill.toybox.infra.debug
+import bill.toybox.infra.inflateChild
+import bill.toybox.infra.snackbar
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.infinity_activity.*
+import kotlinx.android.synthetic.main.infinity_item.view.*
 
-class InfinityActivity : AppCompatActivity() {
+class InfinityActivity : ObservableActivity() {
+
+    val urls = mutableListOf<String>()
+    val cats = CatRepository()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.infinity_activity)
+
+//        infiniteCats.adapter = InfiniteCatsAdapter(listOf("https://cdn2.thecatapi.com/images/fF6nbC_w9.jpg", "https://cdn2.thecatapi.com/images/8mu.jpg"))
+        getNextCat()
+    }
+
+    private fun getNextCat() {
+        cats.random(10)
+            .signalOnForeground()
+            .doOnNext {
+                urls += it
+                if (urls.size == 10 && infiniteCats.adapter == null) {
+                    infiniteCats.adapter = InfiniteCatsAdapter(urls)
+                }
+            }
+            .doOnError {
+                infiniteCats.snackbar("Deu erro! " + it.message)
+            }
+            .subscribeUntilPause()
+    }
+
 
     companion object {
         fun startActivity(context: Context) {
@@ -34,4 +74,25 @@ class InfinityActivity : AppCompatActivity() {
             context.startActivity(intent)
         }
     }
+}
+
+private class InfiniteCatsAdapter(val cats: List<String>) : RecyclerView.Adapter<CatViewHolder>() {
+
+    override fun getItemCount() = cats.size
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        CatViewHolder(parent.inflateChild(R.layout.infinity_item))
+
+    override fun onBindViewHolder(holder: CatViewHolder, position: Int) {
+        Picasso.get()
+            .load(cats[position])
+            .fit()
+            .centerCrop()
+            .into(holder.catImage)
+    }
+
+}
+
+private class CatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    val catImage: ImageView = itemView.catImage
 }
