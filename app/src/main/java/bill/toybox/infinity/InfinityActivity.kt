@@ -25,48 +25,36 @@ package bill.toybox.infinity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.NetworkOnMainThreadException
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.paging.PageKeyedDataSource
+import androidx.paging.PagedList
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import bill.toybox.R
+import bill.toybox.infinity.cats.Cat
 import bill.toybox.infinity.cats.CatRepository
 import bill.toybox.infra.ObservableActivity
-import bill.toybox.infra.debug
 import bill.toybox.infra.inflateChild
-import bill.toybox.infra.snackbar
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.infinity_activity.*
 import kotlinx.android.synthetic.main.infinity_item.view.*
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 class InfinityActivity : ObservableActivity() {
-
-    val urls = mutableListOf<String>()
-    val cats = CatRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.infinity_activity)
 
-//        infiniteCats.adapter = InfiniteCatsAdapter(listOf("https://cdn2.thecatapi.com/images/fF6nbC_w9.jpg", "https://cdn2.thecatapi.com/images/8mu.jpg"))
-        getNextCat()
+        infiniteCats.adapter = InfiniteCatsAdapter()
     }
-
-    private fun getNextCat() {
-        cats.random(10)
-            .signalOnForeground()
-            .doOnNext {
-                urls += it
-                if (urls.size == 10 && infiniteCats.adapter == null) {
-                    infiniteCats.adapter = InfiniteCatsAdapter(urls)
-                }
-            }
-            .doOnError {
-                infiniteCats.snackbar("Deu erro! " + it.message)
-            }
-            .subscribeUntilPause()
-    }
-
 
     companion object {
         fun startActivity(context: Context) {
@@ -76,21 +64,64 @@ class InfinityActivity : ObservableActivity() {
     }
 }
 
-private class InfiniteCatsAdapter(val cats: List<String>) : RecyclerView.Adapter<CatViewHolder>() {
+private object CatItemCallback : DiffUtil.ItemCallback<Cat>() {
+    override fun areItemsTheSame(oldItem: Cat, newItem: Cat) = oldItem.url == newItem.url
+    override fun areContentsTheSame(oldItem: Cat, newItem: Cat) = oldItem == newItem
+}
 
-    override fun getItemCount() = cats.size
+private class InfiniteCatsAdapter : PagedListAdapter<Cat, CatViewHolder>(CatItemCallback) {
+
+    val cats = CatRepository()
+    val fetchExecutor = Executors.newSingleThreadExecutor()
+
+    init {
+        val dataSource = object: PageKeyedDataSource<Int, Cat>() {
+            override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, Cat>) {
+                fetchExecutor.submit {
+                    val start = 0
+                    val loadSize = Math.max(params.requestedLoadSize, 1)
+                    val loadedCats = mutableListOf<Cat>()
+                    for (i in start until loadSize) loadedCats += cats[i]
+                    //callback.onResult(loadedCats, start, loadedCats.size, null, start + loadedCats.size)
+                    callback.onResult(loadedCats, null, start + loadedCats.size)
+                }
+            }
+
+            override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, Cat>) {
+                fetchExecutor.submit {
+                    val start = params.key
+                    val loadSize = Math.max(params.requestedLoadSize, 1)
+                    val loadedCats = mutableListOf<Cat>()
+                    for (i in start until (start+loadSize)) loadedCats += cats[i]
+                    callback.onResult(loadedCats, start + loadedCats.size)
+                }
+            }
+
+            override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, Cat>) {
+                TODO("not implemented")
+            }
+        }
+        val config = PagedList.Config.Builder().setPageSize(12).build()
+        val notifyExecutor = Executor { Handler(Looper.getMainLooper()).post(it) }
+
+        val list = PagedList(dataSource, config, notifyExecutor, fetchExecutor)
+        submitList(list)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         CatViewHolder(parent.inflateChild(R.layout.infinity_item))
 
     override fun onBindViewHolder(holder: CatViewHolder, position: Int) {
-        Picasso.get()
-            .load(cats[position])
-            .fit()
-            .centerCrop()
-            .into(holder.catImage)
-    }
+        try {
+            Picasso.get()
+                .load(getItem(position)!!.url)
+                .fit()
+                .centerCrop()
+                .into(holder.catImage)
+        } catch (ex: NetworkOnMainThreadException) {
 
+        }
+    }
 }
 
 private class CatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

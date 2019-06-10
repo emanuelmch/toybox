@@ -22,10 +22,9 @@
 
 package bill.toybox.infinity.cats
 
-import bill.reaktive.Publishers
-import bill.toybox.infra.debug
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import timber.log.Timber
 
 class CatRepository {
 
@@ -35,11 +34,15 @@ class CatRepository {
         .build()
         .create(CatAPI::class.java)
 
-    fun random(count: Int) = Publishers
-        .onSubscribe<Unit> {
-            for (i in 1..count) it.onNext(Unit)
-        }
-        .signalOnBackground()
-        .map { api.search().execute().body()!![0].url }
-        .debug { "cat found" }
+    private val memoryCache = mutableMapOf<Int, Cat>()
+
+    operator fun get(index: Int): Cat {
+        Timber.d("Looking for cat $index")
+        if (memoryCache.containsKey(index)) return memoryCache[index]!!
+
+        Timber.d("Fetching cat $index")
+        val newCat = api.search().execute().body()!![0]
+        memoryCache[index] = newCat
+        return newCat
+    }
 }
