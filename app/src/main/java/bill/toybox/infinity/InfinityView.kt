@@ -22,45 +22,45 @@
 
 package bill.toybox.infinity
 
-import android.content.Context
-import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.NetworkOnMainThreadException
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.paging.PageKeyedDataSource
 import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import bill.toybox.R
 import bill.toybox.infinity.cats.Cat
-import bill.toybox.infinity.cats.CatRepository
-import bill.toybox.infra.ObservableActivity
 import bill.toybox.infra.inflateChild
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.infinity_activity.*
 import kotlinx.android.synthetic.main.infinity_item.view.*
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
-class InfinityActivity : ObservableActivity() {
+class InfinityView(val cats: RecyclerView) {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.infinity_activity)
+    fun showCats(pagedList: PagedList<Cat>, diffCallback: DiffUtil.ItemCallback<Cat>) {
+        val adapter = InfiniteCatsAdapter(diffCallback)
 
-        val infinityView = InfinityView(infiniteCats)
-        InfinityPresenter(infinityView).observe(this)
+        cats.adapter = adapter
+        adapter.submitList(pagedList)
     }
+}
 
-    companion object {
-        fun startActivity(context: Context) {
-            val intent = Intent(context, InfinityActivity::class.java)
-            context.startActivity(intent)
-        }
+
+private class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    val catImage: ImageView = itemView.catImage
+}
+
+private class InfiniteCatsAdapter(diffCallback: DiffUtil.ItemCallback<Cat>) :
+    PagedListAdapter<Cat, ViewHolder>(diffCallback) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        ViewHolder(parent.inflateChild(R.layout.infinity_item))
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        Picasso.get()
+            .load(getItem(position)!!.url)
+            .fit()
+            .centerCrop()
+            .into(holder.catImage)
     }
 }

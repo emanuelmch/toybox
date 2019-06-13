@@ -22,45 +22,31 @@
 
 package bill.toybox.infinity
 
-import android.content.Context
-import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.NetworkOnMainThreadException
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.paging.PageKeyedDataSource
-import androidx.paging.PagedList
-import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import bill.toybox.R
 import bill.toybox.infinity.cats.Cat
 import bill.toybox.infinity.cats.CatRepository
 import bill.toybox.infra.ObservableActivity
-import bill.toybox.infra.inflateChild
-import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.infinity_activity.*
-import kotlinx.android.synthetic.main.infinity_item.view.*
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
+import bill.toybox.infra.PagedListBuilder
+import bill.toybox.infra.SingleFetchDataSource
 
-class InfinityActivity : ObservableActivity() {
+class InfinityPresenter(val view: InfinityView) {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.infinity_activity)
+    private val cats = CatRepository()
 
-        val infinityView = InfinityView(infiniteCats)
-        InfinityPresenter(infinityView).observe(this)
-    }
+    fun observe(activity: ObservableActivity) {
+        //TODO: This should be doOnCreate
+        activity.doOnResume {
+            val list = PagedListBuilder<Int, Cat>()
+                .setDataSource(SingleFetchDataSource(cats::get))
+                .setPageSize(4)
+                .build()
 
-    companion object {
-        fun startActivity(context: Context) {
-            val intent = Intent(context, InfinityActivity::class.java)
-            context.startActivity(intent)
+            view.showCats(list, CatItemCallback)
         }
     }
+}
+
+private object CatItemCallback : DiffUtil.ItemCallback<Cat>() {
+    override fun areItemsTheSame(oldItem: Cat, newItem: Cat) = oldItem.url == newItem.url
+    override fun areContentsTheSame(oldItem: Cat, newItem: Cat) = oldItem == newItem
 }
