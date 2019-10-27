@@ -22,9 +22,21 @@
 
 package bill.toybox.infinity.cats
 
+import bill.reaktive.Publisher
+import bill.reaktive.Publishers
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
+
+class CatPromise(val id: Int, private val fetch: () -> Cat) {
+    private val lazyCat: Cat by lazy { Timber.d("Requested cat $id")
+        fetch() }
+
+    val cat: Publisher<Cat>
+        get() = Publishers.elements(Unit)
+            .signalOnBackground()
+     .map { lazyCat }.doOnNext { Timber.d("Got here") }
+}
 
 class CatRepository {
 
@@ -34,14 +46,22 @@ class CatRepository {
         .build()
         .create(CatAPI::class.java)
 
-    private val memoryCache = mutableMapOf<Int, Cat>()
+    private val memoryCache = mutableMapOf<Int, CatPromise>()
 
-    operator fun get(index: Int): Cat {
+    operator fun get(index: Int): CatPromise {
         Timber.d("Looking for cat $index")
         if (memoryCache.containsKey(index)) return memoryCache[index]!!
 
-        Timber.d("Fetching cat $index")
-        val newCat = api.search().execute().body()!![0]
+        Timber.d("Cat $index not found, creating promise")
+        val newCat = CatPromise(index) {
+            Timber.d("Fetching cat $index")
+            val x = api.search().execute().body()!![0]
+            Timber.d("Cat $index fetched!")
+            x
+        }
+//        val newCatInternal = api.search().execute().body()!![0]
+//        val newCatInternal = Cat(url = "https://free-images.com/or/7e0a/cat_mom_kittens_cats.jpg", width=0, height=0)
+//        val newCat = CatPromise(index) { newCatInternal }
         memoryCache[index] = newCat
         return newCat
     }

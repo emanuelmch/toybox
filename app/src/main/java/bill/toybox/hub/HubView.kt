@@ -42,9 +42,8 @@ class HubView(private val rootView: View) {
     val clicks2 = UiPublishers.clicks(rootView.infinityImage)
 
     fun loadImage2(url: String) {
-        Picasso.get()
+        Glide.with(rootView)
                 .load(url)
-                .fit()
                 .centerCrop()
                 .into(rootView.infinityImage)
     }

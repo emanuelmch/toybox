@@ -27,6 +27,7 @@ import android.preference.PreferenceManager
 import timber.log.Timber
 
 @Suppress("unused")
+//FIXME: This should be called "ToyBoxApplication"
 class CatBoxApplication : Application() {
 
     override fun onCreate() {

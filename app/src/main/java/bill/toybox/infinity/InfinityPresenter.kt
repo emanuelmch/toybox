@@ -23,7 +23,7 @@
 package bill.toybox.infinity
 
 import androidx.recyclerview.widget.DiffUtil
-import bill.toybox.infinity.cats.Cat
+import bill.toybox.infinity.cats.CatPromise
 import bill.toybox.infinity.cats.CatRepository
 import bill.toybox.infra.ObservableActivity
 import bill.toybox.infra.PagedListBuilder
@@ -36,7 +36,7 @@ class InfinityPresenter(val view: InfinityView) {
     fun observe(activity: ObservableActivity) {
         //TODO: This should be doOnCreate
         activity.doOnResume {
-            val list = PagedListBuilder<Int, Cat>()
+            val list = PagedListBuilder<Int, CatPromise>()
                 .setDataSource(SingleFetchDataSource(cats::get))
                 .setPageSize(4)
                 .build()
@@ -46,7 +46,7 @@ class InfinityPresenter(val view: InfinityView) {
     }
 }
 
-private object CatItemCallback : DiffUtil.ItemCallback<Cat>() {
-    override fun areItemsTheSame(oldItem: Cat, newItem: Cat) = oldItem.url == newItem.url
-    override fun areContentsTheSame(oldItem: Cat, newItem: Cat) = oldItem == newItem
+private object CatItemCallback : DiffUtil.ItemCallback<CatPromise>() {
+    override fun areItemsTheSame(oldItem: CatPromise, newItem: CatPromise) = oldItem.id == newItem.id
+    override fun areContentsTheSame(oldItem: CatPromise, newItem: CatPromise) = oldItem.id == newItem.id
 }

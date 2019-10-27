@@ -33,14 +33,15 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 
 class AttemptCounterPresenterTests {
 
-    @get:Rule
-    val reactiveTestRule = ReactiveTestRule()
+    private val activity = MockObservableActivity.create()
 
     @get:Rule
-    val activity = MockObservableActivity.create()
+    val rules: RuleChain = RuleChain.outerRule(ReactiveTestRule())
+        .around(activity)
 
     private lateinit var view: AttemptCounterView
     private lateinit var game: GameStateContainer
@@ -76,6 +77,6 @@ class AttemptCounterPresenterTests {
 }
 
 private fun createState(attemptCount: Int) =
-        mockk<GameState>().apply {
-            every { attempts } returns attemptCount
-        }
+    mockk<GameState>().apply {
+        every { attempts } returns attemptCount
+    }

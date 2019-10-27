@@ -30,7 +30,7 @@ import androidx.paging.PagedList
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-class PagedListBuilder<Key, Value>() {
+class PagedListBuilder<Key, Value> {
 
     private var dataSource: DataSource<Key, Value>? = null
     private var pageSize = -1

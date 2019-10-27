@@ -30,14 +30,15 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import bill.toybox.R
-import bill.toybox.infinity.cats.Cat
+import bill.toybox.infinity.cats.CatPromise
 import bill.toybox.infra.inflateChild
-import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.infinity_item.view.*
+import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.infinity_item.view.catImage
+import timber.log.Timber
 
-class InfinityView(val cats: RecyclerView) {
+class InfinityView(private val cats: RecyclerView) {
 
-    fun showCats(pagedList: PagedList<Cat>, diffCallback: DiffUtil.ItemCallback<Cat>) {
+    fun showCats(pagedList: PagedList<CatPromise>, diffCallback: DiffUtil.ItemCallback<CatPromise>) {
         val adapter = InfiniteCatsAdapter(diffCallback)
 
         cats.adapter = adapter
@@ -45,22 +46,29 @@ class InfinityView(val cats: RecyclerView) {
     }
 }
 
-
 private class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val catImage: ImageView = itemView.catImage
 }
 
-private class InfiniteCatsAdapter(diffCallback: DiffUtil.ItemCallback<Cat>) :
-    PagedListAdapter<Cat, ViewHolder>(diffCallback) {
+private class InfiniteCatsAdapter(diffCallback: DiffUtil.ItemCallback<CatPromise>) :
+    PagedListAdapter<CatPromise, ViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(parent.inflateChild(R.layout.infinity_item))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Picasso.get()
-            .load(getItem(position)!!.url)
-            .fit()
-            .centerCrop()
-            .into(holder.catImage)
+        Timber.d("Binding cat")
+        val item = getItem(position)
+        Timber.d("Item is not null, right? ${item != null}")
+        item!!.cat
+            .signalOnForeground()
+            .doOnNext { cat ->
+                Glide.with(holder.catImage)
+                    .load(cat.url)
+                    .centerCrop()
+                    .into(holder.catImage)
+            }
+            .doOnCancel { Timber.d("GOT CANCELLED") }
+            .subscribe()
     }
 }
