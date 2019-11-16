@@ -27,7 +27,7 @@ import java.lang.reflect.Modifier
 
 fun Any.forceSet(fieldName: String, value: Any) = deferring { defer ->
     val field = javaClass.findField(fieldName)
-    if (field.isAccessible == false) {
+    if (field.isAccessible.not()) {
         field.isAccessible = true
         defer {
             field.isAccessible = false
