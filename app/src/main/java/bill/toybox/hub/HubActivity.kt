@@ -34,6 +34,6 @@ class HubActivity : ObservableActivity() {
         setContentView(R.layout.hub_activity)
 
         val view = HubView(this.container)
-        HubPresenter(view).observe(this)
+        HubPresenter(view).setup(this)
     }
 }

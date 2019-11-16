@@ -56,7 +56,6 @@ class BoxesPresenterTests {
         val settingsRepository: SettingsRepository = mockk(relaxed = true)
 
         presenter = BoxesPresenter(view, game, settingsRepository)
-        presenter.observe(activity)
     }
 
     @Test
@@ -67,6 +66,7 @@ class BoxesPresenterTests {
         val catFoundState = GameState(1, listOf(catFoundGameNode))
         every { game.play(any()) } returns catFoundState
 
+        presenter.setup(activity)
         activity.onResume()
 
         verify {

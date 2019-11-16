@@ -29,7 +29,7 @@ import bill.toybox.infra.ObservableActivity
 
 class AppBarPresenter {
 
-    fun observe(activity: ObservableActivity) {
+    fun setup(activity: ObservableActivity) {
         activity.onOptionsItemSelectedObserver = this::onOptionsItemSelected
     }
 

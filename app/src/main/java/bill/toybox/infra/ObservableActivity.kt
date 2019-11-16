@@ -24,61 +24,42 @@ package bill.toybox.infra
 
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import bill.reaktive.Cancellable
 import bill.reaktive.Publisher
-
-private enum class Lifecycle { RESUME, PAUSE }
 
 abstract class ObservableActivity : AppCompatActivity() {
 
-    private val lifecycleObservers = mutableSetOf<Observer>()
+    private val publishers = mutableSetOf<Publisher<out Any>>()
+    private val cancellables = mutableSetOf<Cancellable>()
     var onOptionsItemSelectedObserver: ((ObservableActivity, MenuItem) -> Boolean)? = null
 
     //region Activity overrides
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item != null) {
-            onOptionsItemSelectedObserver?.invoke(this, item)
-        }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        onOptionsItemSelectedObserver?.invoke(this, item)
 
         return super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {
         super.onResume()
-        lifecycleObservers.filter { it.lifecycle == Lifecycle.RESUME }
-                .forEach(Observer::run)
+        publishers.forEach { cancellables += it.subscribe() }
     }
 
     override fun onPause() {
         super.onPause()
-        lifecycleObservers.filter { it.lifecycle == Lifecycle.PAUSE }
-                .forEach(Observer::run)
+        cancellables.forEach(Cancellable::cancel)
+        cancellables.clear()
     }
 
-    override fun onDestroy() {
-        lifecycleObservers.clear()
-        super.onDestroy()
-    }
     //endregion Activity overrides
 
-    fun doOnResume(action: ObservableActivity.() -> Unit) {
-        lifecycleObservers.add(Observer(Lifecycle.RESUME, action))
+    fun bind(publisher: Publisher<out Any>) {
+        //FIXME: Check if we're already resumed
+        publishers += publisher
     }
+}
 
-    fun <T> Publisher<T>.subscribeUntilPause() {
-        val subscription = subscribe()
-        lifecycleObservers += Observer(Lifecycle.PAUSE, subscription::cancel, oneTimeRun = true)
-    }
-
-    private inner class Observer(val lifecycle: Lifecycle,
-                                 val action: ObservableActivity.() -> Unit,
-                                 val oneTimeRun: Boolean = false) {
-
-        constructor(lifecycle: Lifecycle, noArgsAction: () -> Unit, oneTimeRun: Boolean = false) :
-                this(lifecycle, action = { noArgsAction.invoke() }, oneTimeRun = oneTimeRun)
-
-        fun run() {
-            action.invoke(this@ObservableActivity)
-            if (oneTimeRun) lifecycleObservers -= this
-        }
-    }
+@Suppress("NOTHING_TO_INLINE")
+inline fun Publisher<out Any>.bindTo(activity: ObservableActivity) {
+    activity.bind(this)
 }

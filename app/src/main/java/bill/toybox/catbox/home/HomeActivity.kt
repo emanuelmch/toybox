@@ -41,13 +41,13 @@ class HomeActivity : ObservableActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_view)
 
-        AppBarPresenter().observe(this)
+        AppBarPresenter().setup(this)
 
         val boxesView = BoxesView(this.boxes)
-        BoxesPresenter(this, boxesView).observe(this)
+        BoxesPresenter(this, boxesView).setup(this)
 
         val counterView = AttemptCounterView(this.attemptCounter)
-        AttemptCounterPresenter(counterView).observe(this)
+        AttemptCounterPresenter(counterView).setup(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -62,3 +62,4 @@ class HomeActivity : ObservableActivity() {
         }
     }
 }
+

@@ -24,16 +24,15 @@ package bill.toybox.hub
 
 import bill.toybox.catbox.home.HomeActivity
 import bill.toybox.infra.ObservableActivity
+import bill.toybox.infra.bindTo
 
 class HubPresenter(private val view: HubView) {
 
-    fun observe(activity: ObservableActivity) {
-        activity.doOnResume {
-            view.loadImage("https://i.imgur.com/guEhXZP.jpg")
+    fun setup(activity: ObservableActivity) {
+        view.loadImage("https://i.imgur.com/guEhXZP.jpg")
 
-            view.clicks
-                    .doOnNext { HomeActivity.startActivity(activity) }
-                    .subscribeUntilPause()
-        }
+        view.clicks
+                .doOnNext { HomeActivity.startActivity(activity) }
+                .bindTo(activity)
     }
 }

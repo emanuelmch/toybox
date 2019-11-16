@@ -27,6 +27,7 @@ import bill.toybox.catbox.game.GameState
 import bill.toybox.catbox.game.GameStateContainer
 import bill.toybox.catbox.settings.SettingsRepository
 import bill.toybox.infra.ObservableActivity
+import bill.toybox.infra.bindTo
 import bill.toybox.infra.debug
 
 class BoxesPresenter(private val view: BoxesView,
@@ -36,36 +37,34 @@ class BoxesPresenter(private val view: BoxesView,
     constructor(context: Context, view: BoxesView, game: GameStateContainer = GameStateContainer)
             : this(view, game, SettingsRepository(context))
 
-    fun observe(activity: ObservableActivity) {
-        activity.doOnResume {
-            settings.watchBoxCount()
-                    .doOnNext { game.newGame(it) }
-                    .subscribeUntilPause()
+    fun setup(activity: ObservableActivity) {
+        settings.watchBoxCount()
+                .doOnNext { game.newGame(it) }
+                .bindTo(activity)
 
-            game.gameStateChanged
-                    .filter(GameState::isNewGame)
-                    .signalOnForeground()
-                    .doOnNext { view.startGame(it.boxCount) }
-                    .subscribeUntilPause()
+        game.gameStateChanged
+                .filter(GameState::isNewGame)
+                .signalOnForeground()
+                .doOnNext { view.startGame(it.boxCount) }
+                .bindTo(activity)
 
-            view.boxChosenEvent
-                    .signalOnBackground()
-                    .debug { "Box #$it chosen" }
-                    .map(game::play)
-                    .doOnNext {
-                        if (it.isCatFound) {
-                            Thread.sleep(2000)
-                        }
+        view.boxChosenEvent
+                .signalOnBackground()
+                .debug { "Box #$it chosen" }
+                .map(game::play)
+                .doOnNext {
+                    if (it.isCatFound) {
+                        Thread.sleep(2000)
                     }
-                    .signalOnForeground()
-                    .doOnNext { game ->
-                        if (game.isCatFound) {
-                            view.onCatFound(game.attempts)
-                        } else {
-                            view.onEmptyBox(game.attempts)
-                        }
+                }
+                .signalOnForeground()
+                .doOnNext { game ->
+                    if (game.isCatFound) {
+                        view.onCatFound(game.attempts)
+                    } else {
+                        view.onEmptyBox(game.attempts)
                     }
-                    .subscribeUntilPause()
-        }
+                }
+                .bindTo(activity)
     }
 }

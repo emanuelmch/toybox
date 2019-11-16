@@ -46,7 +46,6 @@ class HubPresenterTest {
         view = mockk(relaxed = true)
 
         presenter = HubPresenter(view)
-        presenter.observe(activity)
     }
 
     @Test
@@ -54,6 +53,7 @@ class HubPresenterTest {
         val clicks = Publishers.open<Unit>()
         every { view.clicks } returns clicks
 
+        presenter.setup(activity)
         activity.onResume()
 
         clicks.onNext(Unit)

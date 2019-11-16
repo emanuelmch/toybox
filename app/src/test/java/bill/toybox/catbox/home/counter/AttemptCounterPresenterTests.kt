@@ -53,7 +53,6 @@ class AttemptCounterPresenterTests {
         game = mockk(relaxed = true)
 
         presenter = AttemptCounterPresenter(view, game)
-        presenter.observe(activity)
     }
 
     @Test
@@ -61,6 +60,7 @@ class AttemptCounterPresenterTests {
         val gameState = Publishers.open<GameState>()
         every { game.gameStateChanged } returns gameState
 
+        presenter.setup(activity)
         activity.onResume()
 
         gameState.onNext(createState(attemptCount = 2))
