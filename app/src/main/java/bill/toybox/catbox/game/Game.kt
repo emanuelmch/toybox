@@ -36,7 +36,7 @@ object GameStateContainer {
     }
 
     val gameStateChanged: Publisher<GameState>
-        get() = gameStateChangedPublisher.startWith(state)
+        get() = gameStateChangedPublisher.startWith { state }
 
     fun newGame(boxCount: Int) = gameEngine.newGame(boxCount).let { state = it }
     fun play(boxChecked: Int) = gameEngine.play(state, boxChecked).also { state = it }
