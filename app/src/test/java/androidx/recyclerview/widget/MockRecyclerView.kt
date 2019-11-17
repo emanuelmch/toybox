@@ -34,7 +34,7 @@ class MockRecyclerView {
 
     companion object {
         fun create(): RecyclerView {
-            val view: RecyclerView = mockk(relaxed = true)
+            val view: RecyclerView = mockk()
             var adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>? = null
 
             every { view.adapter } answers { adapter }

@@ -20,25 +20,35 @@
  * SOFTWARE.
  */
 
-package bill.toybox.catbox.appbar
+package bill.toybox.catbox.test
 
-import android.view.MenuItem
-import bill.toybox.R
-import bill.toybox.catbox.settings.SettingsActivity
-import bill.toybox.infra.ObservableActivity
+import android.preference.PreferenceManager
+import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.rules.TestRule
+import org.junit.runner.Description
+import org.junit.runners.model.Statement
 
-class AppBarPresenter {
+class SharedPreferencesTestRule(val key: String, val value: Int) : TestRule {
 
-    fun setup(activity: ObservableActivity) {
-        activity.onOptionsItemSelectedObserver = this::onOptionsItemSelected
-    }
+    override fun apply(base: Statement, description: Description) = object : Statement() {
+        override fun evaluate() {
+            val context = InstrumentationRegistry.getInstrumentation().targetContext;
 
-    private fun onOptionsItemSelected(context: ObservableActivity, item: MenuItem?): Boolean {
-        if (item?.itemId == R.id.actionSettings) {
-            SettingsActivity.startActivity(context)
-            return true
+            val prefManager = PreferenceManager.getDefaultSharedPreferences(context)
+            val oldValue = prefManager.getInt(key, 5)
+
+            prefManager.edit().apply {
+                putInt(key, value)
+                commit()
+            }
+
+            base.evaluate()
+
+            prefManager.edit().apply {
+                putInt(key, oldValue)
+                commit()
+            }
+
         }
-
-        return false
     }
 }

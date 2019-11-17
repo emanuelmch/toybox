@@ -22,6 +22,7 @@
 
 package bill.toybox.test
 
+import bill.reaktive.Cancellable
 import bill.reaktive.Publisher
 import bill.toybox.infra.ObservableActivity
 import io.mockk.every
@@ -32,26 +33,30 @@ import org.junit.runners.model.Statement
 
 class MockObservableActivity : ObservableActivity(), TestRule {
 
-    private val resumeListeners = mutableSetOf<ObservableActivity.() -> Unit>()
-    private val pauseOnceListeners = mutableSetOf<() -> Unit>()
+    private val publishers = mutableSetOf<Publisher<out Any>>()
+    private val cancellables = mutableSetOf<Cancellable>()
 
     public override fun onResume() {
-        resumeListeners.forEach { it.invoke(this) }
+        publishers.forEach {
+            cancellables += it.subscribe()
+        }
     }
 
-    public override fun onPause() {
-        pauseOnceListeners.forEach { it.invoke() }
-        pauseOnceListeners.clear()
+    fun mock_bind(publisher: Publisher<out Any>) {
+        //FIXME: Check if we're already resumed
+        publishers += publisher
     }
 
     override fun apply(base: Statement, description: Description?) = object : Statement() {
         override fun evaluate() {
-            resumeListeners.clear()
-            pauseOnceListeners.clear()
+            publishers.clear()
+            cancellables.clear()
 
             base.evaluate()
 
-            onPause()
+            cancellables.forEach(Cancellable::cancel)
+            publishers.clear()
+            cancellables.clear()
         }
     }
 
@@ -59,11 +64,7 @@ class MockObservableActivity : ObservableActivity(), TestRule {
         fun create(): MockObservableActivity {
             val activity = spyk(MockObservableActivity())
 
-            every { activity.doOnResume(any()) } answers { activity.resumeListeners.add(firstArg()) }
-            every { activity["subscribeUntilPause"](any<Publisher<Any>>()) } answers {
-                val subscription = firstArg<Publisher<Any>>().subscribe()
-                activity.pauseOnceListeners.add(subscription::cancel)
-            }
+            every { activity.bind(any()) } answers { activity.mock_bind(firstArg()) }
 
             return activity
         }

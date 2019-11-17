@@ -20,25 +20,32 @@
  * SOFTWARE.
  */
 
-package bill.toybox.catbox.appbar
+package bill.toybox.catbox
 
-import android.view.MenuItem
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
+import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import bill.toybox.R
-import bill.toybox.catbox.settings.SettingsActivity
-import bill.toybox.infra.ObservableActivity
+import bill.toybox.catbox.home.HomeActivity
+import bill.toybox.hub.HubActivity
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
-class AppBarPresenter {
+@RunWith(AndroidJUnit4::class)
+class HubTests {
 
-    fun setup(activity: ObservableActivity) {
-        activity.onOptionsItemSelectedObserver = this::onOptionsItemSelected
-    }
+    @get:Rule
+    val espressoTestRule = IntentsTestRule(HubActivity::class.java)
 
-    private fun onOptionsItemSelected(context: ObservableActivity, item: MenuItem?): Boolean {
-        if (item?.itemId == R.id.actionSettings) {
-            SettingsActivity.startActivity(context)
-            return true
-        }
+    @Test
+    fun testNavigatingToCatbox() {
+        onView(withId(R.id.catImage)).perform(click())
 
-        return false
+        Intents.intended(IntentMatchers.hasComponent(HomeActivity::class.java.name))
     }
 }

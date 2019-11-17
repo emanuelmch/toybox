@@ -20,25 +20,19 @@
  * SOFTWARE.
  */
 
-package bill.toybox.catbox.appbar
+package bill.toybox.hub
 
-import android.view.MenuItem
-import bill.toybox.R
-import bill.toybox.catbox.settings.SettingsActivity
+import bill.toybox.catbox.home.HomeActivity
 import bill.toybox.infra.ObservableActivity
+import bill.toybox.infra.bindTo
 
-class AppBarPresenter {
+class HubPresenter(private val view: HubView) {
 
     fun setup(activity: ObservableActivity) {
-        activity.onOptionsItemSelectedObserver = this::onOptionsItemSelected
-    }
+        view.loadImage("https://i.imgur.com/guEhXZP.jpg")
 
-    private fun onOptionsItemSelected(context: ObservableActivity, item: MenuItem?): Boolean {
-        if (item?.itemId == R.id.actionSettings) {
-            SettingsActivity.startActivity(context)
-            return true
-        }
-
-        return false
+        view.clicks
+                .doOnNext { HomeActivity.startActivity(activity) }
+                .bindTo(activity)
     }
 }

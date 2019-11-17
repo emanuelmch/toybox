@@ -24,16 +24,15 @@ package bill.toybox.catbox.home.counter
 
 import bill.toybox.catbox.game.GameStateContainer
 import bill.toybox.infra.ObservableActivity
+import bill.toybox.infra.bindTo
 
 class AttemptCounterPresenter(private val view: AttemptCounterView,
                               private val game: GameStateContainer = GameStateContainer) {
 
-    fun observe(activity: ObservableActivity) {
-        activity.doOnResume {
-            game.gameStateChanged
-                    .signalOnForeground()
-                    .doOnNext { view.count = it.attempts }
-                    .subscribeUntilPause()
-        }
+    fun setup(activity: ObservableActivity) {
+        game.gameStateChanged
+                .signalOnForeground()
+                .doOnNext { view.count = it.attempts }
+                .bindTo(activity)
     }
 }

@@ -20,21 +20,16 @@
  * SOFTWARE.
  */
 
-package bill.toybox.catbox.home.counter
+package bill.toybox.hub
 
 import bill.reaktive.Publishers
-import bill.toybox.catbox.game.GameState
-import bill.toybox.catbox.game.GameStateContainer
+import bill.toybox.catbox.home.HomeActivity
 import bill.toybox.test.MockObservableActivity
 import bill.toybox.test.ReactiveTestRule
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import io.mockk.*
+import org.junit.*
 
-class AttemptCounterPresenterTests {
+class HubPresenterTest {
 
     @get:Rule
     val reactiveTestRule = ReactiveTestRule()
@@ -42,40 +37,45 @@ class AttemptCounterPresenterTests {
     @get:Rule
     val activity = MockObservableActivity.create()
 
-    private lateinit var view: AttemptCounterView
-    private lateinit var game: GameStateContainer
+    private lateinit var view: HubView
 
-    private lateinit var presenter: AttemptCounterPresenter
+    private lateinit var presenter: HubPresenter
 
     @Before
     fun before() {
         view = mockk(relaxed = true)
-        game = mockk(relaxed = true)
 
-        presenter = AttemptCounterPresenter(view, game)
+        presenter = HubPresenter(view)
     }
 
     @Test
-    fun `should update the view when the attempt count changes`() {
-        val gameState = Publishers.open<GameState>()
-        every { game.gameStateChanged } returns gameState
+    fun `should navigate to Catbox's activity when the image is clicked`() {
+        val clicks = Publishers.open<Unit>()
+        every { view.clicks } returns clicks
 
         presenter.setup(activity)
         activity.onResume()
 
-        gameState.onNext(createState(attemptCount = 2))
+        clicks.onNext(Unit)
+
         verify {
-            view.count = 2
+            HomeActivity.startActivity(activity)
+        }
+    }
+
+    companion object {
+
+        @BeforeClass
+        @JvmStatic
+        fun beforeClass() {
+            mockkObject(HomeActivity.Companion)
+            every { HomeActivity.startActivity(any()) } just runs
         }
 
-        gameState.onNext(createState(attemptCount = 4))
-        verify {
-            view.count = 4
+        @JvmStatic
+        @AfterClass
+        fun afterClass() {
+            unmockkAll()
         }
     }
 }
-
-private fun createState(attemptCount: Int) =
-        mockk<GameState>().apply {
-            every { attempts } returns attemptCount
-        }

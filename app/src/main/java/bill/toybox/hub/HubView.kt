@@ -20,25 +20,21 @@
  * SOFTWARE.
  */
 
-package bill.toybox.catbox.appbar
+package bill.toybox.hub
 
-import android.view.MenuItem
-import bill.toybox.R
-import bill.toybox.catbox.settings.SettingsActivity
-import bill.toybox.infra.ObservableActivity
+import android.view.View
+import bill.reaktive.UiPublishers
+import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.hub_activity.view.*
 
-class AppBarPresenter {
+class HubView(private val rootView: View) {
 
-    fun setup(activity: ObservableActivity) {
-        activity.onOptionsItemSelectedObserver = this::onOptionsItemSelected
-    }
+    val clicks = UiPublishers.clicks(rootView.catImage)
 
-    private fun onOptionsItemSelected(context: ObservableActivity, item: MenuItem?): Boolean {
-        if (item?.itemId == R.id.actionSettings) {
-            SettingsActivity.startActivity(context)
-            return true
-        }
-
-        return false
+    fun loadImage(url: String) {
+        Glide.with(rootView)
+                .load(url)
+                .centerCrop()
+                .into(rootView.catImage)
     }
 }

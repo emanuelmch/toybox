@@ -22,6 +22,8 @@
 
 package bill.toybox.catbox.home
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import bill.toybox.R
@@ -39,17 +41,25 @@ class HomeActivity : ObservableActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_view)
 
-        AppBarPresenter().observe(this)
+        AppBarPresenter().setup(this)
 
         val boxesView = BoxesView(this.boxes)
-        BoxesPresenter(this, boxesView).observe(this)
+        BoxesPresenter(this, boxesView).setup(this)
 
         val counterView = AttemptCounterView(this.attemptCounter)
-        AttemptCounterPresenter(counterView).observe(this)
+        AttemptCounterPresenter(counterView).setup(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main, menu)
         return super.onCreateOptionsMenu(menu)
     }
+
+    companion object {
+        fun startActivity(context: Context) {
+            val intent = Intent(context, HomeActivity::class.java)
+            context.startActivity(intent)
+        }
+    }
 }
+
